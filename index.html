@@ -500,6 +500,7 @@ footer{text-align:center;font-size:8.5px;color:var(--purple);opacity:.35;padding
 
 <footer>Vendemmia Comércio Internacional &nbsp;·&nbsp; Gestão de Projetos e TI &nbsp;·&nbsp; 2026</footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const people = [
   {
@@ -600,7 +601,13 @@ const people = [
   }
 ];
 
-/* ===== Persist edited fields in the browser ===== */
+/* ===== Persist edited fields — shared via Supabase, cached in the browser ===== */
+const SUPABASE_URL = 'https://muvdoqjngsqgzxaaxurl.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_r06mnlHLEIcSvC0F34KKIw_QC8quk-p';
+const sb = (window.supabase && SUPABASE_URL)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+  : null;
+
 const OVERRIDES_KEY = 'vendemmiaOrgOverrides_v1';
 function loadOverrides(){
   try{ return JSON.parse(localStorage.getItem(OVERRIDES_KEY)) || {}; }
@@ -609,16 +616,53 @@ function loadOverrides(){
 function saveOverrides(o){
   try{ localStorage.setItem(OVERRIDES_KEY, JSON.stringify(o)); }catch(e){}
 }
-const overrides = loadOverrides();
-people.forEach((p,i)=>{
-  const o = overrides[i];
-  if(!o) return;
+function applyOverride(i, o){
+  const p = people[i];
+  if(!p || !o) return;
   if(o.acts) p.acts = o.acts;
-  if(typeof o.name === 'string') p.name = o.name;
-  if(typeof o.role === 'string') p.role = o.role;
-  if(typeof o.loc === 'string') p.loc = o.loc;
+  if(typeof o.name === 'string' && o.name) p.name = o.name;
+  if(typeof o.role === 'string' && o.role) p.role = o.role;
+  if(typeof o.loc === 'string' && o.loc) p.loc = o.loc;
   if(typeof o.desc === 'string') p.desc = o.desc;
-});
+}
+
+const overrides = loadOverrides();
+people.forEach((p,i)=> applyOverride(i, overrides[i]));
+
+let remoteReady = false;
+async function loadRemoteOverrides(){
+  if(!sb) return;
+  try{
+    const { data, error } = await sb.from('person_overrides').select('*');
+    if(error || !data) return;
+    data.forEach(row => {
+      const i = row.idx;
+      if(i == null || !people[i]) return;
+      const o = { name: row.name, role: row.role, loc: row.loc, desc: row.description, acts: row.acts };
+      applyOverride(i, o);
+      overrides[i] = o;
+    });
+    saveOverrides(overrides);
+    remoteReady = true;
+  }catch(e){ /* offline ou bloqueado — segue com os dados locais */ }
+}
+loadRemoteOverrides();
+
+async function pushRemoteOverride(idx, o){
+  if(!sb) return false;
+  try{
+    const { error } = await sb.from('person_overrides').upsert({
+      idx,
+      name: o.name,
+      role: o.role,
+      loc: o.loc,
+      description: o.desc,
+      acts: o.acts,
+      updated_at: new Date().toISOString()
+    });
+    return !error;
+  }catch(e){ return false; }
+}
 
 function initials(name){
   return name.split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
@@ -720,8 +764,9 @@ function addActivity(){
   sel.addRange(range);
 }
 
-function saveEdits(){
+async function saveEdits(){
   if(currentIndex === null) return;
+  const idx = currentIndex;
   const name = document.getElementById('modal-name').textContent.trim();
   const role = document.getElementById('modal-role').textContent.trim();
   const loc = document.getElementById('modal-loc').textContent.trim().replace(/^▸\s*/, '');
@@ -730,18 +775,21 @@ function saveEdits(){
     .map(li => li.textContent.trim())
     .filter(t => t.length > 0);
 
-  people[currentIndex].name = name || people[currentIndex].name;
-  people[currentIndex].role = role || people[currentIndex].role;
-  people[currentIndex].loc = loc || people[currentIndex].loc;
-  people[currentIndex].desc = desc;
-  people[currentIndex].acts = items;
+  people[idx].name = name || people[idx].name;
+  people[idx].role = role || people[idx].role;
+  people[idx].loc = loc || people[idx].loc;
+  people[idx].desc = desc;
+  people[idx].acts = items;
 
-  overrides[currentIndex] = { name: people[currentIndex].name, role: people[currentIndex].role, loc: people[currentIndex].loc, desc, acts: items };
+  const o = { name: people[idx].name, role: people[idx].role, loc: people[idx].loc, desc, acts: items };
+  overrides[idx] = o;
   saveOverrides(overrides);
 
   exitEditMode();
-  document.getElementById('modal-avatar').textContent = initials(people[currentIndex].name);
-  showToast('Alterações salvas');
+  document.getElementById('modal-avatar').textContent = initials(people[idx].name);
+  showToast('Salvando…');
+  const synced = await pushRemoteOverride(idx, o);
+  showToast(synced ? 'Salvo e sincronizado para todos' : 'Salvo neste navegador (sem conexão com o servidor)');
 }
 
 function cancelEdits(silent){

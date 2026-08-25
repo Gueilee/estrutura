@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Organograma — Gestão de Projetos e TI · Vendemmia</title>
+<style>
+:root{
+  --purple:#422C75;
+  --purple-dark:#2E1F54;
+  --purple-light:#6B4FB8;
+  --pink:#FF2F69;
+  --pink-dark:#E01A52;
+  --cream:#FFFCF8;
+  --ink:#2A1D4D;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{scroll-behavior:smooth}
+body{
+  font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,Arial,sans-serif;
+  background:linear-gradient(180deg,#FFFCF8 0%,#F3EFFB 55%,#EFE9FA 100%);
+  color:var(--ink);
+  min-height:100vh;
+}
+
+/* ===== HEADER ===== */
+.page-header{
+  position:sticky;top:0;z-index:50;
+  background:linear-gradient(115deg,var(--purple-dark) 0%,var(--purple) 55%,#4E3392 100%);
+  padding:16px 28px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  box-shadow:0 4px 24px rgba(46,31,84,.28);
+  border-bottom:3px solid transparent;
+  border-image:linear-gradient(90deg,var(--pink),var(--purple-light),var(--pink)) 1;
+}
+.header-left{display:flex;align-items:center;gap:14px;min-width:0}
+.logo-chip{
+  background:#FFFFFF;border-radius:12px;padding:6px 8px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 10px rgba(0,0,0,.18);
+  flex-shrink:0;
+}
+.logo-chip img{height:34px;display:block;border-radius:4px}
+.header-titles{min-width:0}
+.page-header h1{color:var(--cream);font-size:16px;font-weight:700;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.page-header .subtitle{color:var(--pink);font-size:10.5px;font-weight:600;opacity:.9;display:block;margin-top:3px;letter-spacing:.2px}
+
+.header-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.fs-btn{
+  display:flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.22);
+  color:var(--cream);
+  font-size:11.5px;font-weight:600;
+  padding:9px 14px;border-radius:10px;
+  cursor:pointer;transition:background .15s,transform .1s;
+  white-space:nowrap;
+}
+.fs-btn:hover{background:rgba(255,255,255,.2)}
+.fs-btn:active{transform:scale(.97)}
+.fs-btn svg{width:14px;height:14px;flex-shrink:0}
+
+/* ===== ORG CHART ===== */
+.org-section{padding:26px 24px 12px;max-width:1440px;margin:0 auto}
+.section-label{
+  font-size:10.5px;font-weight:700;letter-spacing:1.2px;color:var(--purple);opacity:.5;
+  text-transform:uppercase;margin-bottom:12px;
+}
+.org-wrap{
+  width:100%;overflow-x:auto;border-radius:16px;
+  border:1px solid rgba(66,44,117,.1);
+  background:#FFFFFF;
+  box-shadow:0 8px 30px rgba(66,44,117,.09);
+  padding:6px;
+}
+.org-wrap svg{display:block;min-width:900px;width:100%;height:auto}
+#svg-hotspots rect{transition:fill .15s}
+#svg-hotspots rect:hover{fill:rgba(66,44,117,.07)}
+
+/* ===== MODAL ===== */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(46,31,84,.45);backdrop-filter:blur(4px);
+  z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.modal-overlay.show{opacity:1;pointer-events:all}
+.modal{
+  background:#FFFFFF;border-radius:18px;width:100%;max-width:500px;max-height:85vh;
+  display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 24px 70px rgba(46,31,84,.35);
+  transform:translateY(18px) scale(.96);transition:transform .22s;
+}
+.modal-overlay.show .modal{transform:translateY(0) scale(1)}
+
+.modal-accent{width:100%;height:5px;flex-shrink:0}
+.modal-top{padding:22px 22px 16px;border-bottom:1px solid rgba(66,44,117,.09);flex-shrink:0}
+.modal-area-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.modal-badge{font-size:7.5px;font-weight:700;padding:4px 10px;border-radius:20px;color:#FFFCF8;letter-spacing:.3px}
+.modal-top-actions{display:flex;align-items:center;gap:6px}
+.icon-btn{
+  background:rgba(66,44,117,.06);border:none;cursor:pointer;color:var(--purple);
+  font-size:12px;padding:6px 10px;border-radius:8px;transition:background .15s;
+  display:flex;align-items:center;gap:5px;font-weight:600;
+}
+.icon-btn:hover{background:rgba(66,44,117,.13)}
+.icon-btn.save{background:var(--pink);color:#fff}
+.icon-btn.save:hover{background:var(--pink-dark)}
+.icon-btn.cancel{background:transparent;color:var(--purple);opacity:.55}
+.icon-btn.cancel:hover{opacity:.9}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--purple);opacity:.4;font-size:18px;line-height:1;padding:4px 6px;transition:opacity .15s}
+.modal-close:hover{opacity:.8}
+
+.modal-person-row{display:flex;align-items:center;gap:12px}
+.modal-avatar{
+  width:46px;height:46px;border-radius:13px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;
+}
+.modal-name{font-size:17px;font-weight:700;color:var(--purple);border-radius:6px}
+.modal-role{font-size:11px;color:var(--pink);margin-top:3px;font-weight:600;border-radius:6px}
+.modal-loc{font-size:9.5px;color:var(--purple);opacity:.55;margin-top:3px;border-radius:6px}
+.modal.editing .modal-name,.modal.editing .modal-role,.modal.editing .modal-loc,.modal.editing .modal-desc{
+  background:rgba(255,47,105,.06);border:1.5px dashed rgba(255,47,105,.3);
+  padding:3px 7px;margin:-3px -7px;cursor:text;display:inline-block;
+}
+.modal.editing .modal-loc{margin-top:5px}
+
+.modal-body{overflow-y:auto;padding:18px 22px 22px;flex:1}
+
+.modal-desc-wrap{margin-bottom:20px;display:none}
+.modal-desc-lbl{
+  font-size:8px;font-weight:700;letter-spacing:.8px;color:var(--purple);opacity:.4;
+  text-transform:uppercase;margin-bottom:10px;
+}
+.modal-desc{font-size:11.5px;color:var(--ink);line-height:1.55;opacity:.9}
+.modal-desc:empty:before{content:"Adicionar descrição do cargo (opcional)…";color:rgba(66,44,117,.4);font-style:italic}
+
+.modal-acts-lbl{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:8px;font-weight:700;letter-spacing:.8px;color:var(--purple);opacity:.4;
+  text-transform:uppercase;margin-bottom:12px;
+}
+.add-act-btn{
+  display:none;background:none;border:1px dashed rgba(66,44,117,.35);color:var(--purple);
+  font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:7px;cursor:pointer;
+  letter-spacing:.3px;text-transform:none;opacity:.8;
+}
+.add-act-btn:hover{background:rgba(66,44,117,.06)}
+.modal.editing .add-act-btn{display:inline-block}
+
+.modal-acts-list{list-style:none;display:flex;flex-direction:column;gap:9px;outline:none;}
+.modal-acts-list li{font-size:11.5px;color:var(--ink);display:flex;gap:8px;line-height:1.5;padding:2px 0;border-radius:6px}
+.modal-acts-list li::before{content:"▸";color:var(--pink);flex-shrink:0;margin-top:1px}
+.modal.editing .modal-acts-list{
+  background:rgba(255,47,105,.045);
+  border:1.5px dashed rgba(255,47,105,.3);
+  border-radius:10px;padding:12px 12px 12px 10px;
+}
+.modal.editing .modal-acts-list li{cursor:text}
+.modal.editing .modal-acts-list li:hover{background:rgba(255,47,105,.07)}
+.edit-hint{display:none;font-size:9px;color:var(--pink);opacity:.75;margin-top:10px;font-style:italic}
+.modal.editing .edit-hint{display:block}
+
+/* toast */
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  background:var(--purple-dark);color:#FFFCF8;
+  padding:12px 18px;border-radius:10px;font-size:12px;font-weight:600;
+  box-shadow:0 8px 24px rgba(46,31,84,.35);
+  display:flex;align-items:center;gap:8px;
+  transform:translateY(20px);opacity:0;pointer-events:none;
+  transition:transform .25s,opacity .25s;z-index:200;
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast svg{width:14px;height:14px;color:var(--pink);flex-shrink:0}
+
+footer{text-align:center;font-size:8.5px;color:var(--purple);opacity:.35;padding:16px;letter-spacing:.5px}
+
+/* fullscreen mode tweaks */
+:fullscreen body,:-webkit-full-screen body{overflow-y:auto}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <div class="header-left">
+    <div class="logo-chip">
+      <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCACPAyADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9U6KKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigBOKTcB3qjqFiNQ0+4tzLLAs0bR+bbvslXcPvK38LV+R/x0+IHxq+CfxM1rwpqHxG8TyfZZN1rcf2lL+/t3/1Uv3v7o/773V3YXCvFz5IS1LjHmP1+3CjdX4if8NOfFn/oo/iX/wAGsv8A8XXsP7LH7ZXizwx8VtOt/HXinUda8Nakfsdy+qXLy/Y2b7s67vu7WHzf7LMe1ehVyWvThz3L9mfq5RSDpRXgmIm4DGaTI9a/OD9uvUvip8FviNFq+heOfEtv4S17dJbQw6lLstZ1/wBbD9/5V/iX/f2/w18yf8NOfFn/AKKP4l/8Gsv/AMXXtUMpqYimqsJG3sz9u+velPNfkL8Bf20fHfgb4maTe+K/FOseIPDUkv2fULS9uWuNkTf8tU3fxL97/gOyv1tsdQt9UsoLy0nW4tp41kjljbcrKwyrLXFi8FVwcrTIlHlLHJbOA3vS7k5Gee9C/dIPFfI/7Wn/AAmngXWLXX9E8RatbaJejZJBb3LIkMyr/wCgso/8dauKUuU9bJcrecYuGDhUUZS25j6549RScf3hX5if8Lq8d/8AQ3ax/wCBkv8A8VR/wurx3/0N2sf+Bkn/AMVWftEfqH/EK8z/AOf0Px/yP06WUMOCG/3aXcW6c/hX5kWvx08f2cglh8V6m7f9NLhmT/x6vW/ht+2hr+k3ENt4thXWbFvla5hRY54/9r+6/wD47T9pA83HeG2cYSj7WlKNT+6viPt7gqaOAtYvhfxVp3jHR7bVNLuo7ywuE3xyxHIIra4K9K1PyqpTlTk4SVpIfRRRUkhRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAnevkj/goN+z/AP8AC0PhqfF2lWwfxF4ajeVti/PPZ/elT6pjev8AwP8AvV9bZ71HJGrxurLuVuq1tQrSw9WNSPQZ/P1RXv37Z3wDf4G/Fq6jsLfy/DGs7r3TGVPkiX+O3/4A/wD466V4DX6bSqwrwjVidZ+rv7Av7QB+K3wvTw1qlzv8SeG1SB97fNPa/wDLKX/gP3G/3V/vV9WYzX4dfAL4v6h8C/ilo/iuy3PDA3lXluv/AC8Wrf61P/if9pEr9sPDfiGw8V6Bp+taZcJeadqECXVvOnR43Xcp/Wvhc0wn1erzx+GRzSjY4f8AaF+D1l8cvhTq/he72pcTL51jcMP9Rcrnyn/9lb/Zdq/FPxBoN94V1vUNI1W2az1Cwna3nt3+/EyvsdK/fkdDX50/8FKvgB/Z+oWvxR0W2/0e5ZLPWkRPuSfdin/4F9xv91P71dOT4v2c/YS2kXTkfBlfpf8A8E4vj/8A8Jd4RuPhzrV0H1XQoxJprSN80tnnGz6xNx/uun92vzQrp/hn8RNU+FXj3RfFejS7L/TJ1lVP4ZU/jRv9l03r/wADr6fH4X63Q5TaUec/d/7uB2rlviH4KsviF4R1DRL9MxXMRQNjJRv4W+qtzTvhx460v4meCdI8UaPKZdO1SBJ4hn5k7Mjf7StuVvdTXU9zxX5vJcr5ZHPRqVMPVjVpvllE/KDxVoN54P1++0nUE8u7sp2jkUdD/wDY1mYz82a/RT4mfs1+E/iprS6tqP2uyv8AyxFJLZyIPMVT8obcrVyX/DD/AIKxzqWs/wDf+P8A+N1z+yfc/pvA+JmVvDQeKUlUt71onwuCnan/AEr6b+PH7PvgT4ReEJtQivdUm1CY+TaQzTx7WkP8Tfu/uqtfMY9qxqQ5D9FyTOsNnmHeJwqko7e8fQP7IPxRk8L+OR4bupWOk6sdiK3/ACzuP4W/4F93/vmvu4bfmOa/K7wE8lv478P3EP8ArI9QgZf97zVr9T0xtU/3hk11UtYH89+JmX0sLmdPE0v+XsdfVE9FFFWfj4UUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUlFeN/Hj9qDwh+zvcaNB4og1OZ9WWV4P7PgSX/AFWzdu3Ov99acKcqkuWAHsdGPevkj/h5t8Jv+fLxL/4ARf8Ax2vZ/gX8fvDf7QWg3+r+GYb6G2srn7LKNQhWN9+0N0Vm/vVvUw1alHmnGxfKz1KiiiucgKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAGjHpS4qGSVYY2d2CKo3Mzdq+T/AIh/8FHfhl4P1ibS9Mi1TxO8T7ZLzT0Rbfp/C7N83/fO33rajQq15ctONx8p9bUV4f8AAn9rjwF8frhrDQ725sdcSLzW0rVI1imZP7y7XZWH+6xr3CoqU5UpcskIWiiioAKKKKACiiigAooooAKKKKAPE/2rPgbB8evhPf6LHGg1y0P23SpnH3Z1/g/3XXK/iG/hr8ZbyznsL2W2uYmhuLdmilhmXY6sv8Ff0CV+Yn/BRr4Anwb40j+IOk22zR9fl2agqL8kF5/f/wC2q/N/vI3rX0mT4v2c/YT2ZvTkfGNfoR/wTV+P32iG5+F2tXGZIt95ozu3VfvSwf8AtVf+2vpX571r+FPFGo+CfE2l6/pNw1rqOnzrdQyKOFZa+lxuGji6Xs0ayjzH751g+NPCOmeO/C2q+H9Zg+06XqMD288XTKsCOPeuc+CPxW0z4zfDbRvFWmsqreRDz7fdzbzrxLF1/hb9Nteg1+cOMqUzkPwp+MXwv1H4O/EbWvCupr5kljP+6uNvyzxN80Uq/wC8tcXX6j/8FEPgAPiB8PU8b6Rbh9d8Nxs1yqL809jnc/8A37Pz/wC7vr8uK/RMBivrdC73R1xlzH25/wAE3/2gP+Eb8T3Hw21m52aZrDfaNKaRv9VdfxRf9tV/8eT/AG6/Sz3r+f8A03UrnR9StL6zna2u7WVZYJoW2PEy/OjpX7R/sw/HC1+PPwp03xADFHq8eLTVLZP+WV0n38f7LfeX2YV87nGD9nP28NmZVInrf3QSB+FMnkSFC7kKijJJNO3beT2Fed/Hy31jUPhR4ih0F8X5gYYX7zRn/WKv+1t3V88PC0VicRToSly80krnxP8AtEfFZ/ih4/uJoJN+kWG62sl/hZf4pf8AgTf+O7a8t+6tG31oVGkbYq72avObuz+6cswOHynBww1D4Io9d/Ze+H8njz4p2ErR/wDEv0p1vbh/9pf9Uv8A31t/74av0RGF4A7V5N+zj8L/APhWHw9tormELq98ftN4f4lOPlj/AOAr/wCPbvWvW8nAycetd0Y8kbH8kcZ54s7zWc6f8On7sf8AP5klFFFB8KFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAI1fnb/AMFXP+Qz8OP+uF//AOhW9fok1fnb/wAFXP8AkM/Dj/rhf/8AoVvXrZV/vcTSn8R8D1+mX/BLP/kkviz/ALDX/tvFX5m1+mX/AASz/wCSS+LP+w1/7bxV9Rm/+6SNqnwn2zRRRXwJyhRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQB88/t2+JtQ8M/sx+K5tMlaGa68iykmT+GKWZUf/vpcp/wOvx6r93Pij4A0z4reA9Z8J6uGFhqkHks6/fjbO5HX/aV1Vv8AgNflb8QP2DPi34L1uW2sdAbxNYb/ANxf6WyMsq/7affWvq8nxVGnTlTn8RtTkeO/C/xNqHg34jeGtZ0uRor+z1CKWPb/AB/P9z/gf3K/eBeVH0r84P2Vv2BfFFn400vxZ8RLSLSNO0udLq30l5VmuLmVTuQvs+VU3/P/AHv4dor9IOgFcWcV6VerGNL7IVJDqKKK8ExCiiigAooooAKKKKACiiigBB0rjfip8OdK+LfgHWvCerpmx1KAxs4HzRP95JF/2lcK34V2VHFOMpRlzRA/BX4heB9V+GvjTWPDGsweTqWl3LW8qfwN/cdP9l0+Zf8Afrn6/SD/AIKRfs//ANueHbT4m6Pbb9R0tVttXjiT/W2/8Ev1RvlP+y/+zX5v1+kYLExxdD2nU7Iy5j63/wCCefx+Hw3+JDeDdXuNug+JJVSJmb5YLz7sTf8AA/uf98f3a/VIdK/n5hmaGRJYmZHVt6ulfsX+x38dk+Onwis7y7mSTxLpe2y1VD95nX7kp/31+b/e3V87nOE5J+3jszKpH7R7rNClxG0Uqq8bLtZGX5TX42/tgfAaT4DfFy9sbONk8NapuvdKb+5Gz/PF/wAAf5f93Z/er9mOK8M/a4+A8fx6+Et7p1si/wDCRaduvdKmx/y1X70R/wBl1+X/AHtjfw15eW4v6rX974ZERlyn4019A/sW/H5/gZ8WbddQuvL8K63ss9TVm+SL/nlcf8BZv++XevAZoZba4lgniaGWJtrI67XRqZX6BVpQr0fZSOg/oGjZZEDA7lNOZQykEZBr5M/4J9/H7/haHw0HhTVbkN4i8NxpF87fPPZ9In+q/cb/AID/AHq+tTX5nXoyw9WVORyPQ/PL9qL4S/8ACt/Hsl3ZwbNE1YtPDtX5Y5P+Wkf/ALN/usa1/wBkf4Sjxv4x/wCEgv4t2k6Myuu5flkuP4V/4D978Ur61+MXwztvip4GvtGmCx3WfOtbhx/qpl+63/sv+6xq/wDC/wABWXw38F6foNmFZbdP3kw/5aP/ABN/31XJ7P3rn7DU46nPhv6hzf7R8N/7vf8AT8TslUKoA6UUUtaH46JXj/ir9rD4VeCdevNF1rxfbadqllJ5c9rNbz70b/vivX88V+cX/BTz4Q/YPEGhfEOyt8Ragv8AZuoOi/8ALdFLQv8A8CTcv/bJK7MHRp4isqVR2LjufVX/AA2z8E/+h+tP/Aa4/wDjdehfDn4peF/ixokureFNZh1qwhn+zyTwqy7ZNqtt2sAw4dfzr8J6+wv+CbHxcPg/4rXng29m22HiSEeRuf7t1FvZf++k3r+CV7eLyaFCjKdN3LlTP1JopKWvmDEaetU77ULfTbO4u7uZbe2gjaWWR+FRV5Zqumvln/goT8XP+Fd/Ay40Wzn8vVPE8n9nx7G+dYPvXD/987U/7a1pQpSr1Y049QOz/wCG1vgn/wBD5af+Atx/8bo/4bY+Cf8A0Plp/wCAtx/8br8aK9P/AGbPhPL8ZvjN4d8N+Uz6fJP9o1F1/htYvml/77+7/vOlfWTyfDU4c85yOn2cT9p9C1y08R6LY6pp832jT76FLi3m2su6N13K3ze1aTMOprj/AIh/ETw78IPBd1r2vXcem6RYx7QEX52b+GONP4mOOFFfll+0R+2x41+Nt5dafY3U/hnwmzMkWm2Uu17hP+nh/wCL/c+7Xz+FwFXFz9z4TKMeY/R/x9+1d8KvhtJJBrfjLT/tsR2PaWRa6lVv7rLEG2H/AHsV5Tf/APBTD4S2cmyK28RXv+3DYxBf/H5Vr8q6K+mjkdGK99m3s4n6xaP/AMFIfg7qkgW4udY0pf793p+5f/ITPXt/gP4zeCPihEz+FfE+na06rue3gnHnJ/vRN86/itfhdVjTdSvNHv4rzT7mezu7dt8Vxbyurq399HWpqZHRl/CmL2Z/QFRivz2/ZJ/b6u77VLHwb8TrxZvOZYbHxFN8rBv4UuP/AI7/AN9f3q/QjdwDXymJw1TCz5KhjKLicv4y+JPhb4ex20nibxDp3h9LlmWB9QuUh8wr94LuPNcz/wANNfCX/opPhf8A8G0P/wAVXy//AMFVv+RV8AH/AKfLr/0GKvzkr2cDldPE0I1ZSsXGPMfvd4X8WaP400eHVtB1S11jTZWZY7qylWWJtrbWwy8dqt6xrFjoNjLe6le29hZRDdJcXUqxRL/vM3Svzk/Z1/bE0L4B/sufYJU/tjxWupXKWOkq23arKr+bK38Kbnf/AGm/8er5d+LHxz8a/GrWmv8AxTrM95826CxV9tvB/wBcovur/wCh1nSyerUqyj9kPZn6u69+2l8FvD9w8F148sZWXvYwy3S/99xIy/rVjw3+2B8HPFFwkNl4+02OZvlVb/faf+PSqtfi9RXrf2HQt8Ui/ZH9AFnfQajax3NtNHcW8i7kkjbcrLVmvxM+CH7S3jf4D6tFPoWpSTaVu3XOj3bM9rP/AMB/hb/aX5q/Wf4FfHLw/wDHvwPbeINCkMTriG7sJnHnWkvdHH/oLfxCvnsdl1XB+98UTKUeU9OooqhqGpWuj2NxeXc8dtaQRtLNPK2xY1X7zM3+eleYZl04FcJ46+NngX4Zqo8UeK9M0eXG7yLicec3/bNfmP8A3zXwL+09/wAFBtZ8V3114c+G1zJo2grujl1lflu7z/c/55J/4/8A7v3a+MLy8nv7qW5uZ5Lm4lbe80zb3dq+iwuTzqR5675TaNO5+teqf8FEPgtYSMkOuX99t6vb6bLt/wDHwta3hf8Abt+DHiqdYE8Wf2XK3RNTtZbdf++yuz/x6vx5or1v7Ew/eRfs4n776NrGn+ILCK+0u+t9RspRmO4tJVlib/dZa+AP+Crf/IY+G/8A1wv/AP0K3r5D+FHxu8ZfBfWl1HwvrM9gN37+0Z91vP8A9dYvutXrX7Xn7RGlftG+Gfhxq1tH9h1qzjvYNT0zd/x7y/6PtZf76t/B/wACrlw+W1cJi4S+KJEY8sj5pr9Mv+CWf/JJfFn/AGGv/beKvzNr9Mv+CWf/ACSXxZ/2G/8A23ir0M3/AN0kaVPhPtf7tJS54zXxl+1x+3ZD8K7q68H+BRDf+Kospd6hKu+Cwb+4q/xy/X5V77j8tfEUcPUxE+Smc0Y8x9VeMPiD4c8A6ab7xHrlhodp0E19cJFn2Xd96vB/Ef8AwUQ+DOhzNFDq+oa0y/e/s/T32/8AkTZX5V+LPGuveOtYl1bxBq93q+pSfeuLqVmb/wDYrFr6qlkdOP8AFmdHsz9Uof8Agpr8JppNrWPiWJf7z2MQH/o2u/8ABf7bXwd8cTJb23i+3027Ztvk6rG1r/4+w2f+PV+N1FbSyPDy+Bj9nE/oAtbyDULeOe3kjngkXckkbblZas1+KPwN/ac8c/AXU4pNE1JrnR9++fRbp3a1kX+P5f4H/wBpK/WT4G/HLw78e/A9v4h0GYo3EV3YzP8AvrSXujj/ANBbowr5vHZfVwnvfFExlHlPSuleZT/tKfCi3nkhl+IvhlJYn2MrapF8rf8AfVemM2VOK/A/xh/yNut/9fkv/odVluBjjnJSlawRjzH7W6L+0B8NfEWqWum6V488PX+oXUnlQWlvqMTyyv8A3VXdnNd3eX0GnWslzczRwW8S7pJJG2qq+tfhP8L/ABMngr4keFdelkaGHS9Ttb2VlX+CKVGevT/2nf2qvEfx88TXdvHez2XguCXbY6UrbEdV+5LL/ekb/wAd/hr0qmRzVWMYS90r2Z+kXif9tD4MeE7h4Lvx1Y3EqnYV0+OW7X/vqJGX9ab4b/bV+DHii4SC18dWdvIw/wCYhDLaL/33KirX40UV2/2HQ5fikX7I/f3TtQtdSsorqzuI7q2lXfHLA+9WX/ZYVdavxe/Zv/ai8Vfs/eIrdra5n1HwxLL/AKdok0v7pl/ieL+7L/tf991+jPxw/bC8LfCn4T6Z4s02ePXNQ8QQeZotiJNnm8ffk/uKnRv9r5f93wMTltWjVjCPvcxjKJ7nrniLS/DGmyahq+pWul2UX3ri9nWKJf8AgTV5Lqn7aHwW0e4MM/j7T3ZR1tI5bhP++4kZf1r8lvid8YPFvxg8QPq3ivWbjUZ9+YoWbZFAv92JPuqtcbXs0siXL+9mX7M/aXQ/2wPg14gkWK1+IGko7f8AP87Wv/o1Vr1fTdSs9YsY7uwu4b+1kG5LiCRXRvoy8V+Add58J/jl41+C2rrf+Ftcnsxu3S2LPut5/wDrrF91v/Q6irkSUf3Uw9mfud9agubqKxt5JppFiijXczt91Vrxn9mT9pPR/wBo7wc95bIuna9Y7U1LTN+4xMfuup/ijbsa9Q8cf8iXr/8A2D7j/wBFtXzEqcqdT2czI43/AIaa+En/AEUnwv8A+DWH/wCKrQ8OfHL4eeL9Yg0nQfGmhaxqs+7yrOxv4ppX2rubCq391Sa/Dd/vNXoP7PHxBtPhb8aPC3im/eSOw0673XLxpvbynR0bb/wF2r6mpkkYwk4zNfZn7barq1lodjLe6heQ2FlCu6S4upVjiUf7TN0rxbxB+298FfDl00M/ji2u5V/6B1tPdp/33EjLX5jfH79pLxX+0B4klu9Wu5LbRY5W+w6PFL/o9svqf77/AO3/APsV5PU0MkXLevIfsz9nfCf7ZHwd8ZXEcFj46sIp2O1V1BJbMZ/3pUVa9mhuI7qJJYnWWJl3KynKkV/P5X0X+yp+154g+BPiG103UrmbVPA9xJsubB23/Zf+msH91v8AY/j/APH6jFZLyQ56ErilTP1/x1rF8TeLdD8Gaa1/rmr2GjWa9bjUblIE/wC+mNeAftT/ALYWj/A/whYp4flt9a8T63bLc6bHu3QxwP8AduH/ANn+6v8AFX5Z+PPiR4l+J3iCXWfE+s3esahL/wAtbhvuf7CJ91F/2ErgwWV1cTHnl7sSYx5j9cLz9tf4KafN5c3j2zZx18i3nlUf8CWIitbQP2svhB4ouEhsfiBo6yt91buVrUn/AL+ha/FSiva/sOh/NI19kf0A2d5BqECT28sdxBIu5ZI2DK1WK/Ef4K/tIeOfgVq0Vz4d1aSTTN26fRrtme0uP+Afwt/tL81frP8AAP48aF8fvAUHiDSD9nnQiG+sJHDS2k+OUPHzL/df+IV8/jsuq4T3viiZSjynoOq6taeH9Mu9S1C4js9Ps4mnnuJW2rFGq7mZvpzXnP8Aw1R8If8Aoovh3/wPStf9oH/khPxD/wCxfv8A/wBJ3r8Nf4q6Mty+OOjKUpWsEY8x+4Ph/wDaI+GnirWLXSdI8b6JqWp3TbYLW3vFd5G/2R3r0j1r8Xf2OP8Ak5zwD/2EP/ZHr9olrmzDCRwlRQiwlHlDioppkhQu7BFUbizdq82+O3x58OfAPwbJrmvTM8khMNlYQsPOu5eyqP7v95v4RX5VfHL9rDx78dby4XVNSbTdAZsRaLp7Mtuqf7f/AD1b/ab/AMcowmX1cV7y+EUY8x+oHjH9rr4Q+BpJIdU8c6cbiPhorDfeOv4RK1cC/wDwUa+DKzbV1DVXT++unPtr8l6K+ihkdH7czb2cT9o/Af7XXwk+IlxDa6T4zsYr2RtiW+oK9m7t/dXzlXd/wHNey5z05r+fevp39ln9tTxH8GdYs9G8R3lxrXgiVlikgmbzZbBf78H+x/sVx4rJHCPPQlcmVM/TDVPjr8O9E1K60/U/HHh+w1C1k8qe0uNThSWJ/wC6yFsg1B/w0V8LP+ii+Fv/AAcW/wD8XX45/HbXbbxN8avHWqWNzHeWV5rV5LBcQv8AJLE0r7HT/gNcRD/rErSGSQnT53MXsz+gZWDrkU6qun/8eNv/ANc0/lVqvlHuYhRRRSAzdW0i117S7vTdQgju7C8ieCe3lXKyRsu1lb65Nfiv+0l8F7v4EfFfVfDcnmvprt9q0y4f/lvat93/AIEn3W/2kav24618zftzfs//APC5vhXNqOmW/meJ/DyteWYRfmni/wCWsH/fK7l/2kH96vWyvF/Vq/LL4ZGkZH5H17h+yJ8d5PgT8XLK/u5GTw5qmyz1VP8Apm33Jv8AgD/P/u7l/irw+ivva1KFenySOg/oDgnS4iSWNleNl3K6t8pqboK+Qf8Agnf8fv8AhY3w3bwVqtzv17w3GiQ73+eaz/g/74+5/u7K+vzX5nXoyw9WVORyPc/Lf/got8Af+EB8fR+O9Ittmh+IpW+1Ii/JBffeb/v797/e318e1+6Pxf8Ahlpnxi+HeteE9TXFvfwlUm2/NDKPmilX3VsH8K/Ejxp4R1L4f+LNU8O6xD9n1HTJ2gnUf3l/uf7FfaZPi/rFL2MviidEJHT/AAK+LV/8Efidoviuy3OlrLtvLdG/18Df62L/AL5/8f2V+2PhvxHYeLvDum63pdwt5p2owJdW0y9HRl3Kfyr8Da/Q7/gmb8brnU7XVfhlqTST/Yon1LTJD0ji3KJYvpudXX/fasM5wfPT+sQ+yFSJ9+UUtFfFnMFFFFACDpXm3x/+F8Hxk+E/iPwpII/tF7bFrR2/5Z3SfPE//far/wAB3V6TRkU4ylCSlED+f2/s59NvLizuYmhuLeVopYXX51Zf4Kt+G/EF94V8QaZrWmz/AGbUNOuYrqCb+7Kr7kr6P/4KEfCE/Dj43S63aQbNI8UK99HtX5VuP+Xhf++tj/8AbWvl2v06hUjiaMZfzHYfu58K/Hdl8Tvh7oHinTz/AKLqtolxt3Z8tj99P+AtuX/gNdatfB//AATB+Kzal4b8Q+ALy43Taa/9o2Kv/wA8n+SVB/sq+xv+21feNfneLovD15U2cstxG6V+Q37enxaPxM+PWp2dvP52keHV/su22t8rSr/r2/7+7k/4Alfpb+0R8S0+EHwa8U+KFdUurW1ZLPcPvXMnyRD/AL7Zf++a/EWaaW5uJZ5WZ5ZW3s7t87V7mSYf35V+xpTGV+lP/BMv4Q/8I/4H1j4gX0Gy61uT7HYsy8raxP8AM3/A5f8A0VX57eAfBuofETxpovhrS133+qXkVrF/sbn++/8Asp96v2E+Kl5afs+/sx64NEP2WPw/of2OxbukmwRRP/vb2Vq9DN6vuww8PtF1P5T87v25v2gp/jJ8UrrR9PuW/wCEV8Oyva2aI3yTyr8stx/338q/7Kf7bV82UffbdXX/AAh8N6J4s+JXh/SvEurwaFoEtyr319cS+UiwL87/AD/3n2bF/wBp69ilTjhqPLH7JfwHqP7PP7GXjL4+w/2rG0fh/wAMbtv9q3ibzL/f8pP4/wDx1f8Aar7B8Pf8EwfhrYWif2trPiDU7n+JknigQ/8AAdjf+hV7Do/7SHwT8P6Xa6bpnjnw3ZWFnGkEFvDdIqRqowqqK0f+GqvhD/0UXQP/AAMSvjsRjcdVk+WMoxMZSkfPfi//AIJc+CL61k/4RrxNrOj3ZX5ftqxXUX/jqI//AI9Xw58cv2fvFv7P3iJNN8SWyvb3G5rPU7cbre5Vf7rf3/8AYev1m/4ap+EPf4i+H/8AwNWvHf2rvih8HfjD8D/EWjJ448P3eqW0DX+m7btC/wBqiG5FX3f5k/4HW2Cx2LhUUasXKI4ykflfX6yfsB/G6X4rfCI6Tql19o1/w0yWU0jv80sDZ+zu3v8AK6f8A/2q/JuvrL/gmr4vk0L9oRtHMmbfXNMnt9n+3F+9R/8AvlH/AO+69zNaHtsNJ/ylS+E9p/4Krf8AIq+AP+vy6/8AQYq/OSv0b/4Krf8AIq+AP+vy6/8AQYq/OSoyf/dI/MdP4Qr334E/sWfEL45WcWrW0EPh/wAPSjK6lqQdfPH/AEyT7zf+g/7VN/Yx+BkPx0+MVraapGJvD2kxfb9QU9JVV/ki/wCBv/47vr9hLO0hsbeO3giWGGNQqRxqFVVx90VjmWZSwsvZUviFKXKfnzN/wSpvPspMfxGie62/dbR2VP8Avrzq+aPjr+yn46+AUguNbso7/Q3fZHrGnnzIN391v41b/er9p+1Y/irwtpnjbw7qGhazax32l38DQXFvKOHRuMV4tDOMRCa9r70SPaSPwOr3f9jP42z/AAV+M+lyTz7PD+syLp+pqz/Ltdvkl/4A/wA3+7v/AL9edfGH4fz/AAp+J3iTwpOXlfTLxoIpZP8AlpF9+Jv+BJsauN/ir7KUY4mjy/ZkbH9BIOVr4D/4KUfHyfTYbD4X6NctC11Gt5q7xNz5WT5UH/ju9v8AgFfXvwJ8WP45+DfgzXrh99zeaVbvO/8Ael2BX/8AHg1fj7+0Z42l+IPxy8a65K29J9TlSD/rlE/lRf8AjiJXx+VYX2mJlz/ZMYR9483rX8I+D9b8ea9baLoGnXGrapcttjtbVdzN/wDYf7dZFfrz+xb+z7YfBX4X6ff3Vov/AAluuQLdahcMnzxK3zrbj+6qZ+Yf3s/7NfTY/GRwdLmW5tKXKfMfgX/gl14s1Syin8U+KbHw+7fO1pZwNeyqfRn3ov8A3zurY8Tf8ErdTis2l8P+Pre7u1X5YdQ09oEb6ujv/wCg1+iuKMV8j/a2L5ubnOf2kj8Lvit8FPF/wU1waZ4q0iSxab54LhRut519FlX5Wrhq/dP4sfCrQvjJ4JvvDPiC1WayuUPlyhR5tvLj5JYz/Cy+tfij8SvAeofC/wAea74W1X/j90u5aBnX7jf3HX/ZdNjf8Dr6fL8w+tR5J/EaxlzHNV+mX/BLP/kkviz/ALDX/tvFX5m1+mX/AASz/wCSS+LP+w3/AO28VLN/90kOp8J6n+2n8e3+BXwjlfTZxD4n1l2stNYfei4zLP8A8AX/AMeZK/H2aaW5laWRmmllbezu3zs1fV3/AAUm8dS+Ivj9/YayYtfD9jFAqf8ATaVfNd/++XiX/gNfJ1GVYeNHDRm95CjH3Td8G+C9b+IXiSz0Lw9ps2qapeNtjgt16f8AxCf7dfdHw3/4JcwtYw3HjrxVOLt13Np+iquIv+2sgO7/AL4p/wCwXrnwn+EXw9l1/X/GOhWXi/W2ZZY7i6RZbW2V9qRf7O7Zv/75/u19VH9qn4Qf9FF0A/8Ab6tedmGOxXtPZUItW8iZSkeO3P8AwTJ+E01r5cV74jt5P+eq3kTH/wBFV87/ABy/4Jv+I/AulXet+CdTfxVZwL5smnSQeVfKvom35Zf/AB1v9mvuv/hqr4Q/9FF0D/wNWj/hqr4Q/wDRRtA/8DFrzaWMzClLm96RHNI/Ez7jba90/Y5+OE/wS+M2mXM87JoGrOthqsTN8vlM/wAkv/bJvm/3N/8Afqt+2LbeEP8AheWr6l4H1Wy1XRtWVb//AIl774o52/1q/wDfSb/+B14pX2Xu4vD+/wDaOj4j+ghvu59q/A/xh/yNut/9fkv/AKHX7Vfs7+MJPHfwN8E65O/m3V1pMHnv/elVdj/+Pq1fir4w/wCRt1v/AK/Jf/Q6+eyOPJVqwMqZj12nwq+D/iv40eJE0Twppcl9dKu6eY/JDAv96V/4a4uv2c/ZP+DFr8FPg5omnC3WPWb6BL7VZtp3PcOu4p/upnaP93/ar2Mxxn1SmmviKlLlPkiw/wCCV3iWbT0a98caZb3m35oIbSSVP++8p/6BXz18eP2W/HH7P9xHJr9pHeaRM+yDWNPbdbs391v4lb/er9qTiuX+IHgbSviV4N1bwxrUCz6dqUDQSLjle6svoysAy/7tfNUM4xEZ/vNYke0kfg9Vi5v7m8itIp7qSaK1i8qBHbekS73fYn91d7u3/A60vGvha58D+Lta8P3pzdaZeS2Un+9E+3/2SsWvuE1UVzbU1fDPhfV/GWu2uj6Jp82qapeNtgtbddzM1fWvhX/gmJ8QNW05LnWdc0bQrh04tcvcOvs+35R/wFmr3v8A4J1fA+x8HfCxPHN3bK+v+It3lzMvzQWavtRF/wB5k3/98f3a+w6+Qx2b1Y1HTobIylUPxv8Ajl+xj8Q/gTpz6vqFvba1oCt82paU7OsA9ZVZVZf/AEH/AGq8Hr9+NX0qy8QaXd6dqFtHeWF3G0E8Eq7kkRhtZWr8Pvjd4B/4VZ8WfFXhZWZotLvpYoGf77Rffib/AL5dK9PLMwliuaFX4ioy5jpf2Wvi9P8ABb41aBrfntDpVxKllqa/wNayvtb/AL4+R/8AgFfsj4258E6//wBg+4/9FtX4JfxV+2fgXxFJ4r/Zl0bV5H33F54VSWVv9s2vzf8Aj2a4M6pWqQqkVD8T3+81Mp7/AHmqWxsJ9Vv7eztommuLiVYokT+Jnr6taK5tqd58F/gB4y+POttp/hPTfOigOLnULhvKt7X/AHm/9lT5q+pF/wCCVviMWG9vHelm+2/6n7DL5W7/AHt//slfbfwO+EmnfBT4a6L4U01F3W0Ye7uFX/j5uW5mlP1b16KFXtXouMV8Ric4rzqWpaRMZVD8Q/jZ+zv41+AOrRWnifT1+yTnFtqdq3mWs/8AuN/e/wBl9rV5nX7j/HD4W6d8ZvhnrnhbUIlb7ZCxtpnX/UXC/wCql6fwtj/gO6vw9vLOWwvJbadWhlt2eKVH/hZa+iy3G/W6dp/FEuMuYfealeak0TXlzPcvFEtvF50rvtiX5ET/AHUrY8CeAfEHxM8SwaF4Y0qbV9Vn+7b26/wf33f7qp/tvXP1+un7DPwPsfhT8F9L1Wa2X/hIfEMKX93cMvzrG/zQxf7qqd3+871rj8ZHA0uZbsuUuQ+XdD/4Jd+PL7TRPqniXQ9Mu2T/AI9o/Nnx7M5X/wCKrxL46fso+PfgGq3eu2kN/osjeUuq6azy2+7+638St7stftJx0rnfHXhHTfH3hPVfDurwC407UrdreZOmVbPzL/tL96vl6OcYiM/3msTH2kj8GK+iP2Fvi9P8LfjxpNnJPs0bxE6aXdxbvl3t/qnH+7Lt/wCAu9eH+MPDc/gzxbreg3f/AB9aXeS2Uv8AvRO6f+yVn2F5PpuoW95bNsuLeVZYn/uMtfY1qcMRR5f5jY/cH9oL/khfxC/7F+//APSd6/Db+Kv22+L2qrr37NXi7Uk+5eeFbq4X/gVozf1r8Sf4q8HI9IVERTPZ/wBjf/k5zwB/2EP/AGR6/ZTUL+30mxuby6lW3treNppZG+6qqNzNX41/sb/8nOeAP+wh/wCyPX6O/t5eNpPBX7NPiT7O+y51ZotKRv8AZlb97/5CWWuXNqftcZTpkS+I/NH9pT43X/x6+KGp67NJImlRu8GlWrf8sLVfu/8AAn+83+01eU0V63+y38Gf+F6/GTSPDs+5dKXde6ky/fW2i+9/32+xP+B19R+7wtH+7E2+A1vgB+x/45+P6jUNNgj0fw6rbW1jUN6xP/1yT70v/oP+3X1pon/BK/wpDZour+NNZvLr+J7KCK3T/vlt9famkaNY+H9LtdM021jstPtIlhgt4F2pGi/dVRWhjivia+bYmrK8Hyo5/aSPzy+IP/BLWeGzln8F+L/tE6r8llrMG0N/21T/AOIr4i8d+AfEHw18SXXh/wASabNpeq233reVf/H0f+NP9tK/eqvmz9t34B2nxj+E+oaja2o/4SnQIXvbG4VPnljX5pbcf76g7f8Ab2/7VdeBzaqqijX1RUZH5E0+H/XL/vUynw/65f8Aer7J7G+p+/2n/wDHjb/9c0/lVqqun/8AHjb/APXNP5Var8qluziCiiikAUlLRQB+R37eHwB/4U/8VW1rS7bZ4Y8RO91bbF+WC4/5axf+Pbl/2W/2K+Za/bj9oz4N2Px0+FOr+Gbny0vXXz9PuX58i6T7jf7vO1v9l2r8VNb0e+8N6ze6VqVtJZ6hZztbz28334pVfY6V99lWL+sUOSfxROmMjrPgn8VNR+C/xL0XxVpwZxZy/wCk2+7/AF8Df62L/gS/+yV+3HhTxNp/jTw7puv6Tcrd6ZqECXVtKnR0ZcivwOr9BP8Agmn8e/M+1fC3WrnLKHvNGaRv+By2/wD7VX/tr6Vy5zg/a0/rEPshUifoL2r4I/4KTfAE6lptt8UNGt83VmFtdZVFzui+7FP/AMAzsb2ZP7lfe/pWbrmh2XiTR77SdStku7C+heC5t5RlZI3Xay/lXyuFxMsLVjViYxlys/Aiv1X/AOCfvwDHwt+GCeKdTttniHxOqTncvzwWf/LJP+Bffb/eX+7XzX8Of2Ib2P8AaxvPCeswS3Hg7Q3XVJLqZPkvLNmP2dP95mG1v9yX+7X6hoqxrtUbVWvdzbHxqRjTpfaLqSuS0UUV8wYhRRRQAUUUUAfOP7c3whHxW+A+qyW0Bm1jQM6pZ7fvOqL++T/gUW//AIEq1+QVf0CvGsiMjLuVuqtX4p/tTfCRvgr8bPEXh+KPydKaX7bp/wD16y/Mv/fHzp/wCvq8kxOkqEjanIf+yn8UP+FSfHbwxrcsvk6e8/2K+/ueRL8ju3+59/8A4BX7WryK/n2r9oP2SfikvxS/Z/8ADes3U+/ULOD+z9Qdm582D5Nzf7y7X/4HSzvD6xrLqFQ+Yf8AgqN8Tsf8Ir8P7WTj5tXvlVv96KBf/Rv/AI7X5+16P+0V8TG+Lnxm8VeJklZ7S5vGWz/64RfLF/46q157bW0t5dRW0ETTSytsVEX52avewFH6th4pm0fhPt3/AIJi/CD+2PFmtfEK+g32ukr9g05nX/lvKn71v+AxfL/21r6T/wCChVw0P7LfiSNP+WtzZq34XCN/7LXov7Ovwoi+DPwf8PeGEVfttvAJb50/juX+eU/Tcdo/2VWuZ/bY8Ot4m/Zh8c28SbpYLWO9A9opUlb/AMdVq+Plifb5hGr9nmObm94/GuiivRv2e/h/onxR+LWh+FPEGpXOkWWps0C3Vvt3rJtbyl+b+821f+B193Oapw55nUec0V+lv/DrPwV/0N+u/wDfuH/4mj/h1n4K/wChv13/AL9w/wDxNeT/AGvg/wCYz5on5pUV+lv/AA6z8Ff9Dfrv/fuH/wCJo/4dZ+Cv+hv13/v3D/8AE0f2vg/5g5on5pV7p+xDK0f7UngMr0NzcJ/5Ly19c/8ADrPwV/0N+u/9+4f/AImuw+EP/BP7wp8H/iNo3jCw8R6vf3els7R29wsQRt0Tp821P9usMRmuGqUpwhIOaJ57/wAFVv8AkVfAH/X5df8AoMVfnJX6N/8ABVb/AJFXwB/1+XX/AKDFX5yV0ZR/ukfn+Y6fwn6J/wDBKnTY49B+IGobf30tzZwb/wDZVJW/9nr727V8L/8ABKv/AJEnxz/1/wAH/oD190dhXymZ/wC9zMJ7i0tJS15hB+Rf/BRK2jtv2oteZV+e4tLOVv8Avwqf+yV80V9O/wDBRn/k53Vf+vGz/wDRVfMVfpeC/wB2pf4Tsj8J+yH7GNy3/DKfgmb+JbKfH/AZ5a/HS8ma5upZW++zb2r9jf2I/m/ZX8CBv+fe4/8ASmWvyK8faDL4V8c+INGnXZLp2o3Fqy/7srpXj5Vb61XX94iPxE3w602DWPiD4a0+5Xfb3Wp2tvL/ALrSolfvKnCivwC02/n0rUrS+tm2XFrKssT/AN1lr91fht43sfiV4D0TxNpziS01S1S4Xac7Gx86f7ytuX6rXPn0ZXhIiodXRRRXyhiJ7V+T3/BSbSYNP/aSaeBVV7/SLW4n/wBpvni/9AiSv1gY4FfjN+2Z8Srf4oftBeJNQsJRc6bZsunW0oOVKxrtdl/2Gfe3/Aq97JYy+s8yNqW54fX6Zf8ABLP/AJJL4s/7Df8A7bxV+Ztfpl/wSz/5JL4s/wCw3/7bxV9Bm/8AukjSp8J8ZftjXLXP7TXxAaT7/wDaOz/vlERK8ar6E/b08NyeH/2oPFjsmIb/AOz3sX+0rRJv/wDH0evnuu/Cy5sPD/CVEKK+5f2ev2EPA3xw+EuieLv+Eq1m2urtXS7t4Vi2wSo210+5/wAC/wCB16R/w6z8Ff8AQ367/wB+4f8A4muGWa4WEuWUvwI5on5pUV+lv/DrPwV/0N+u/wDfuH/4mj/h1n4K/wChv13/AL9w/wDxNT/a+D/mHzRPzSor9Lf+HWfgr/ob9d/79w//ABNH/DrPwV/0N+u/9+4f/iaP7Xwf8wc0T1f9guZrj9lXwWW6qLxV/wDAuavyT8Yf8jbrf/X5L/6HX7cfBv4Y2Xwd+G+leENPupr2z07zfLnuNu9t8ryc7fdzX4j+MP8Akbdb/wCvyX/0OuPKJRnXrziKPxFfw/Cs2vafFKu9GuokZP8AgdfvynQfSvwJ8Mf8jFpP/X1F/wCh1++y9B9K5s+3pen+RFQdSUtJXy5ifit+2Cqw/tLfEFVXZ/xM2f8A8cSvHq9k/bE/5Oa8f/8AYR/9kSvG6/UMN/u8P8J2an7h/s4wpD8Afhyka7U/4R6w/wDSdK9H7mvO/wBnb/kgfw5/7F6w/wDSdK9E7mvzKr/EkcYnrX49/t9wrD+1Z4y2/wAS2bt/4CxV+wnrX4//APBQD/k6jxf/ALln/wCksVe5kf8AvMv8JtS3Pnav2O/Z7Zn/AGN/Dm7r/wAI5L/6A9fjjX7G/s8/8ma+HP8AsXJP/QHr1s4/hw/xF1D8dX+81d18AYVuPjl8PY5E3o3iGw3f+BCVwr/eau//AGef+S9fDr/sYrD/ANKEr3a/8CRep+5FLSUtflpxjW6V+FPxshWH4yePool2Iuv36Kn/AG8PX7rN0r8K/jl/yWz4gf8AYxX/AP6UPX0uRfxZm1M4pPv1++XhSBLXwzpEca7Y47SJFX/gC1+Bqffr99/Df/IB0v8A69o//QBW+ffDSCoalJS0lfJmJ+Jn7VaKn7RnxEVV/wCY1O//AI9XlafeWvU/2rv+Tj/iJ/2F5/8A0KvLE+8tfp2H/gQOzU/ZfxD/AMmX33/YiN/6QV+Mv8Vfs1r3/Jl17/2ITf8Apvr8Zf4q8XJfhq/4iKZ7P+xv/wAnOeAP+wh/7I9faP8AwVIupF+DPhi3Vvlk15Hf/gNvN/8AFV8Xfsb/APJzngD/ALCH/sj190/8FMtDbVv2fLW+Rc/2XrVvcP8A7rJLF/6E6UsZ/wAjGlcJfGflfX3b/wAEqrCCbxV4+v3VRcW9la26v/su7s3/AKKSvhKvrj/gmr8Qrbwr8bL7QbuVYYvEVi0EG5us8XzqP++PNr0cyjKWElylS+E/VOiiivzs5BM1HJGrxurLuVvvLUn3a5T4neOrP4ceAde8TX7qltpdpJcEOcb2UfKn/Am2r/wKnFOUlFDPw48Z6bFo/jDW7GD/AI97W+uLeL/dV3SsqH/XL/vVLf3kt/eXFzO2+W4laVn/ALzNUUP+uX/er9V+ydep+/2n/wDHjb/9c0/lVqqun/8AHjb/APXNP5Var8qluzjCiiikAUUUUANPpX5w/wDBSX4AHS9Wtfifo9sBa3zJa6vHGmNk3SKX/ga5Vv8AaRP71fo/w1cz478GaX8RPCGreG9Yg+06dqVu9tMmR0b+JePvL95foK6sJiJYWsqiLjLlPwbrV8J+JtS8F+JNN13SblrTUtOnW6glX+Fletz4s/DXU/hD8Q9a8K6qubnT59iTbPlni+8sq/7LLtauOr9JhyVafqdJ+4/wR+K2mfGf4a6N4q01lVbyIefb7ubedf8AWxdf4W/8d216Fmvyq/4J6fH7/hW/xIbwbq9xt0HxJKqRMzfLBefdib/gf3P++P7tfqrxjNfnePwzwtdw+yc8o8obF3bsfNTqKK4DMKKKKACiiigAooooATHBr4o/4KY/CEeJvh3pvjmxgDX2gS+ReMi8vayt/wCyy7f+/j19rtWJ4u8L2XjTwxq2g6jF51hqdtJazoe6upU10Yat9XrRqIqO5+CFe7fA/wDaOufhP8Ivid4UWWXztfs1TTtv/LKd/wB1K/8As/um/wDIS15X8R/A978NfHeu+GNSXZe6XeNas+37+1/kf/cdPn/4HXO1+jyhDFQ986wr6c/4J+/B8/Er46Wur3cPm6R4YVdSn3L8rXH/AC7r/wB9fP8A9sq+Y6/Xf9g/4RD4W/AfTbi5h8rWPEWNVutw+ZUZf3Cf98fN/vO9cGa4j6vhuVfaM5S90+k6zdc0a28QaNf6VfRCeyvoXtp4z/FG67WH5GtOivz/AMzmPwh+LPw71D4TfEXXfCepK3n6dctEjuv+ti/gl/4Gmxv+B1zVjfz6beW95ZztbXcEqyxTQtsdWX7jpX6q/ts/snr8ctBj8Q+GYI4vGWlxlVH3Pt0PeIt/fXqp+q/7v5W6rpV5ompXGn6hbT2F7as0U9vcRbHib+461+i4HFwxdK7+I7Iy5j9Ov2bf2/PC/j3SbPRvHl9D4Z8UxosTXtwdlpdn+/u+7E3X5Wwv93+6PrfT9Ss9VtVubK6hvIH+7NBIro3/AAJa/AOtDTfEGp6P82n6hd2G7/n3nZP/AEGvMr5HTnLmpS5SPZn72ahqVnpVq1ze3UNnAn3pp5FRF/4E1fN/xq/b1+HPwvsbqDRtRj8Za8qssVppsga3Vu3mz/d2/wC7ub2r8o9S17U9YbdqOoXN+/8A08Tu/wD6FWfSoZHTjL97PmD2Z+u37Jv7XmlftB6W+l6msOkeNbVd09gj/u7lP+esG7k/7Sfw19J+9fgh4Nu9esvFOlXHhlrtdfjnVrFtP3faPN/h27a/bT4P3vi7VPh1od347srXTvFcsAN5b2b7kVv5K395V715GaYGOEnzU9pGMo8p8mf8FVv+RV8Af9fl1/6DFX5yV+jf/BVb/kVfh/8A9fl1/wCgxV+clfR5P/ukfmb0/hP0h/4JV/8AIleOf+v+D/0B6+6Owr4X/wCCVn/Ik+Of+v8Ag/8AQHr7o7Cvlcz/AN7mYT3FpaSlrzCD8kf+CjP/ACc7qv8A142f/oqvmKvp3/goz/yc7qv/AF42f/oqvmKv0vBf7tS/wnZH4T9lP2Iv+TWfAf8A1wuP/SqWvhb/AIKJ/COfwF8bW8TW0D/2R4mi+1K6r8q3S/LKv/oLf9ta+6f2If8Ak1rwJ/1xn/8ASqWuq+PvwX0f48fDm+8L6tiJ3Ils73bue1nX7sq/qrf7LMK+Lo4j6rjpTl8PMc/NyyPxBr6d/Y//AGxrz4A3TaBr0c+qeC7yTzWWL/W2Mv8AHLEP40/vr/wL/f8AE/ip8JfEnwa8W3Xh7xNp7WlzG37qb/llOv8Az1ib+Ja46vualOljaXLL4To+M/czwL8bvAnxOsIrjwz4q03Ui658lJ1W4T/eib51/Fa3PEnjzw74Psmu9b13TdHt1Xc0t9dpEv8A48a/BfzKe7M/3mZ6+d/sJc3xmPsz9AP2rv8AgoHYahot/wCEvhncSTvco1vd+INrxIi/xrb/AMW7/a/75/vV+flFddr/AML9f8L+A/Dni3VLVrTS9elnSw8378ix7N0u3+6+/wCX/davbw9Clg48kdzaMeU5Gv0y/wCCWf8AySXxZ/2G/wD23ir8za/TL/gln/ySXxZ/2Gv/AG3irjzf/dJE1PhMD/gp18JJdS0XQPiJZQ7zp/8AxK9TdV5SFn3ROf8AZ3s6f9tVr87K/fLxT4Z03xl4fv8AQ9WtkvdLvoWgubd+jow5Ffjx+05+zD4g/Z58WTLJFNfeFbmVv7P1hU+Vk/55S/3ZV/8AHvvLXFkuMi4/V5/EKnI3P2Q/2sLz9nXXp7LUoZdR8H6lKr3drFzLby/89Yh/e/vr/F8v92v1F+Hfxq8EfFmxS78K+JLDVd6b/s6y7biP/eib51/Fa/DOnpM8LI0TMjr910rtxeVU8VLnXuyCUeY/oF3r61wfj744eBPhfavP4p8U6dpToP8Aj2ecNO3+7EuXb8Fr8Tn8beI3t/IbXtSe3/54/bH2Vju7O29m315kMiXN78yPZn6NTf8ABTrRH+KVlZ2+hTR+Ah+6uNRl/wCPvd/z1WJc/Ivdfv8A/oNfbWh65YeJdHtNU0q7iv8ATryNZbe6t33JIrdGU1+BFfe3/BNPVvicb+8sIrVp/hoNzyXF6zKkE/8A07f3mb+Nfu/xfe++ZhldKjS9pS93lCUT9Em6fhX4H+MP+Rt1v/r8l/8AQ6/fBvu/hX4H+MP+Rt1v/r8l/wDQ6nIfiqBTIvDH/IxaT/19Rf8AodfvsnQfSvwJ8Mf8jFpP/X1F/wCh1++ydB9KM+3pBUHUlLSV8uYn4s/tif8AJzXj/wD7CP8A7IleN17J+2J/yc14/wD+wj/7IleN1+oYb/d4f4Ts1P3F/Z3/AOSB/Dn/ALF6w/8ASdK9F/irzr9nf/kgfw5/7F6w/wDSdK9F/ir8yqfxJHGJ61+P/wDwUA/5Oo8X/wC5Z/8ApLFX7Aetfj//AMFAP+TqPF/+5Z/+ksVe5kf+9S/wm1Lc+dq/Y39nn/kzXw5/2Lkn/oD1+OVfsb+zz/yZr4c/7FyT/wBAevWzj+HD/EXUPx1f7zV3/wCzz/yXr4df9jFYf+lCVwD/AHmrv/2ef+S9fDr/ALGKw/8AShK92v8AwJl6n7kUtJS1+WnGNbpX4V/HL/ktnxA/7GK//wDSh6/dRulfhX8cv+S2fED/ALGK/wD/AEoevpci/izNqZxSffr99/Df/IB0v/r2j/8AQBX4EJ9+v338N/8AIB0v/r2j/wDQBW+ffDTCoalJS0lfJmJ+Jf7V3/Jx/wARP+wvP/6FXlifeWvU/wBq7/k4/wCIn/YXn/8AQq8sT7y1+nYX+BA7NT9l9e/5Muvf+xCb/wBN9fjL/FX7Na9/yZde/wDYhN/6b6/GX+KvFyXar/iIpns/7G//ACc54A/7CH/sj1+sfx2+Ha/Fb4R+KfCnyiXULFktmb7qzr80R/B1Wvyc/Y3/AOTnPAH/AGEP/ZHr9ou1efnMnDFRlEmp8R/P9f2E+lX9xZ3kTW13bytFLDMux1ZfvpT9H1W80HVLTU9PuZLPULOVbiC4hbY8TK+9HSvuj9v79k27j1S9+J/hKzNxa3B8zXLG3X54m/5+kX+62Pn/ANr5v4mK/BlfUYXEwxlLmRrGXMfqt+zV+3d4V+KWj2Gl+Lr638M+L0Xy5GuGEVpeN/fjf7qs39xv+A7q+rIbiK6jWSORZYm+ZWVtwNfz+1t6V428Q6Db+RpmualpsX9y0vHiT/x2vEr5HTnLmpT5SPZn7l+LfH/hzwDpJ1LxJrdnotko/wBdezKm7/d/vH/dr8xv2yv2xR8cJo/C/hUzW/gu2l82SSVdsuoSr91mX+GJT91f+BN/sfLuparfaxceffXk95cN/wAtriVnernhXwvqnjbxJYaHotrJe6nfTrBDBGcBmaunC5VSwkva1JcwRjymRT4f9cv+9W1468J3PgPxnrnhu7lWa60m+ls5Jovus0T7Xdf++axYf9cv+9XtxnzxujTU/f7T/wDjxt/+uafyq1VXT/8Ajxt/+uafyq1X5XLdnEFFFFIAooooAKKKKAPjH/got8Af+E68CQ+PNItQ+ueHYit4sa/NPYZy3/fpvn/3WevzCr+gG5tYr6CSCeNZYZF2tG67lYV+NX7W3wJk+A/xb1DTYIm/4R+/P2zSpf8Apg3/ACy/3kf5P++G/ir67JsZzL6vM3pyPOPhr4H1f4jeO9F8NaCrNqmo3KxQP/c/vu/+wifP/wAAr91NJtZdP0uztZbiS9lhhSJriX70jKuC7e7da+Jv+CbXwDOh+Hrr4l6xb7L/AFRWtdKjZP8AV2+/55fq7Lt/3U/2q+6T0FebnGJ9tW9nH7IqkrjqKKK8MxCiiigAooooAKKKKACkpaKAPir9sH9iPX/jd8QLHxV4Qu9Jsrue0W21JdQlePeyH5HUqjc7Pl/4CteC/wDDsP4q/wDQV8L/APgZcf8AyPX6m0V6tHM8TRhyQehfNI/NDwL/AMEzfGtr4y0WfxPqnh+TQIbqKS/htLmV5ZY1bLov7pPvj5a/SmGFYYVjjCoqjaqr2qfFLXJiMVUxbvVCUnIKKKK5SBK8V+OX7KvgL4+RtPrmnG01pV2xa1YHyrhf7ob+GRfZs9K9rpKqnUnSlzQYH5h+Pv8AgmL480W4kk8La3pfiO2/hS4JtZ/++X3J/wCP15HqH7Efxt02VopfAd3N/t29xbyp/wCOvX7MfWkr2o51iYfF7xt7SR+Nml/sPfGzWJ0jXwNcW/8At3V1bxIv/fT17L8P/wDgl34v1SWKbxf4k03QrXHzW+nq11P9P4VX/vp6/S6l+lKpnGJn8Puh7SR4/wDBb9lvwB8Crcv4e0rzdWZdkusX7eddv/wP+H/gO2vYKKWvGnUnUlzTZifNf7Zn7NOvftHaN4btNC1LTtOfS55pZH1BpBu3qoAXajf3a+WP+HW3xBP/ADNPhr/v5cf/ABqv05o/Gu2jmGIw9P2cHoXzM+cP2N/2a9d/Zy0HxHY65qWnalLqVzFNFJp5c7QqsvzbkX+9X0gtGaAa46tSVaftJ7kC0lLRUAfD/wC1J+w34u+OnxcvfFeka7othZTW0ESw3plEvyJt/hRq8k/4dbfEH/oafDX/AH8uP/jVfpzRXqU8yxNGHJB6F80jzb9nj4bXvwh+D3hzwjqVxb3d7pkUiSTWm7yn3Su/y7uf4q9K7UZFHWvMlJzk5SIOJ+J3wl8KfGLw82j+K9Hh1S0+/E7jbLA39+N/vI30r4f+Jn/BLnUYbiW58BeKIbi3b5l0/W02sv8A21Rdrf8AfC1+iv40uK7MPja+G/hSLjJxPx71b9gf43abIFTwit+v/PS11C1ZfyeWptB/4J+fG3W7jZP4Yg0eL/nrfajb7P8Axx3b/wAcr9fKK9L+3MV/LEv2sj4j+B//AATZ0LwjqFvq3xA1KPxNdxtvTSbRWWyVv9tm+aT/AHfl/wCBV6h+19+zHqf7Qng/w9pXh+807SbnSblpFa+3LF5TJt2LsRv7q19GijP415ksZXnV9rKXvEc0j8xv+HW3xB/6Gnw1/wB/Lj/41X1r+xz+zzrn7OngnWtG1y/sdRnvtQ+1xvp7NsVfKRMfMq/3K+hKKutmFfER9nNhzSHVk+I/DuleLdFudJ1mwt9T026TbPaXUe9HX0KmtaiuDYg+Fvi5/wAExdD1m6kvvAGuP4fldt503Uka4t/+AyffX/gW+vmvxJ/wT7+NPh2ZhD4dttaiX/ltpt9Eyf8AfLujf+O1+vlN59a9elm2Jo9eb1NPaSPxhX9jH40NJt/4QHUv++4v/i67Xwn/AME5/jH4gki+3afpvhyJvvtqF8r/APjkW+v1q5o/CuiWd4h/DGJXtJHxj8JP+CavgzwlcQ3/AIz1G48XXq/N9lVPs9ov+9/G/wD30o/2a+vtJ0mx0PT4bDT7OGwsbdPLht7eJUijX+6qr0rRyKQkV49fEVcRLmqyuZcwjLlTX5qa5/wTH8faprF/eL4m8OIlxO8qozT8bmz/AM8q/S2kIq8PiquFd6TKjJxPzQ0r/gmH8QLDVLS6fxP4cZYZUlba0/8AD/2yr9LlX5RSgU6jEYqrimnVYSk5BSUtFcpB+f8A8c/+CfXjX4pfFnxN4ssNf0G1s9UufPjhuGnEqrtxhtsVcJ/w61+IP/Q0+Gv+/lx/8ar9Ofxor1IZpiYR5IvQvnZyfwt8MXHgf4beFPDt3LHcXWk6Va2Es0AwjtFEiMy/7OVrraKWvMk+Z8xA3FfCv7S37B/jH41fGTXfGGl67olpY3ywCO3uzKJVKQJF822Jv7lfdfWm1vh8RUws+eluVGXKfmP/AMOtviD/ANDT4a/7+XH/AMar7p+F/wAMb/wN8CdK8D3V1bz6lbaW9g9xDv8AKLsGG7+9t+avUBS4Fb1sdXxKSqvYfMfmL/w62+IO7/kaPDf/AH8uP/jVdH8Mv+CcXjrwP8R/CviO68R+H7i10jU7W9lhhefe6RSq7Kn7r73yV+i3NH1rWWaYmUeRvQr2khaWiivLMhpX5a/OT4g/8E3fHXjHx74l1+28R+H4LfVNSur2KGZp96LLK7qG/ddRur9HO1Ia6sPiqmFfNSZcZcp+Yo/4Jb/EE/8AM0+G/wDv5cf/ABqv0s0m0On6Xa27MHaCFImZf9lcVeFLVYjGVcU71WEpcwtJS0VxkH57/Gb/AIJ3+N/iR8U/FPimx8Q6Da2urXslzFb3DT71Vm6NtirjP+HWvxB3f8jT4a/7+XH/AMar9Ofxor1I5piYR5IvQvnZ5vqHw6vr34Az+A1uLddUk8NHRRcNu8rzfsvlb/723d+OK+Dv+HW3xB/6Gnw1/wB/Lj/41X6c+lHWuehja+H5vZPcOY+APgT/AME+/Gvwp+LXhnxZf6/oN5Z6Xc+fLDbtOZWXawwu6P3r7/xwKUUdRUYjE1MVLnq7hKXMMZQy4YZr5I+O3/BO3wb8Srq41fwpcnwdrUrb5IoY99lK3/XL/ln/AMA+X/Zr65GPWlzUUa1XDy56crE8x+Q3jL/gn38ZfC07fZtEtvEdurf8fGk3iN/45Ltb/wAdrh/+GTfjD5vlf8K91zf/ANejbP8Avqv2w/GjjvXsRzrEfaRr7Rn5OfDv/gnL8VfFlxE2uQWXhDT2+/LezpLLt/2Iot3/AI86195/s+/sq+Df2ebEy6ZDJqevzJsuNavFzMy/3EX/AJZp7df7zNXuBwKBiuPEZjXxEeSb90iU5SPz5+M3/BO3xn8Rvip4m8Uabr+gWtlq19JeRw3DTiVC53YbbFXGx/8ABLX4gq+7/hKfDX/fU/8A8ar9OOKPxqo5piYR5E9A55ENvH5NtFGf4VVasUUV5ZAUUUUAFFFFABRRRQAleQ/tE/s76H+0L4Z03StVla0nsb6O7gvIV+dF3jzU/wCBL/48qN/DXr9JThOVOXNEDP0nSLTQNLtNN0+3jtNPs4Uggt4lwsUartVF+gFaNFFIAooooAKKKKACiiigD//Z" alt="Vendemmia"/>
+    </div>
+    <div class="header-titles">
+      <h1>Organograma — Gestão de Projetos e TI</h1>
+      <span class="subtitle">Vendemmia Comércio Internacional · 2026</span>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="fs-btn" id="fsBtn" onclick="toggleFullscreen()">
+      <svg id="fsIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+      <span id="fsLabel">Tela cheia</span>
+    </button>
+  </div>
+</div>
+
+<!-- ORG CHART -->
+<div class="org-section">
+  <div class="section-label">Estrutura Organizacional</div>
+  <div class="org-wrap">
+    <svg viewBox="0 0 1400 592" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', Arial, sans-serif">
+      <rect width="1400" height="592" fill="#FFFCF8"/>
+      <line x1="720" y1="8" x2="720" y2="584" stroke="#422C75" stroke-width="1" opacity="0.10" stroke-dasharray="4,5"/>
+      <line x1="330" y1="88" x2="330" y2="110" stroke="#422C75" stroke-width="1.3" opacity="0.45"/>
+      <line x1="170" y1="110" x2="490" y2="110" stroke="#422C75" stroke-width="1.3" opacity="0.45"/>
+      <line x1="170" y1="110" x2="170" y2="114" stroke="#422C75" stroke-width="1.3" opacity="0.45"/>
+      <line x1="490" y1="110" x2="490" y2="114" stroke="#422C75" stroke-width="1.3" opacity="0.45"/>
+      <line x1="170" y1="184" x2="170" y2="255" stroke="#422C75" stroke-width="1.1" opacity="0.4"/>
+      <line x1="170" y1="333" x2="170" y2="365" stroke="#422C75" stroke-width="1.1" opacity="0.4"/>
+      <line x1="170" y1="443" x2="170" y2="475" stroke="#FF2F69" stroke-width="1.2" stroke-dasharray="5,3" opacity="0.8"/>
+      <line x1="490" y1="184" x2="490" y2="232" stroke="#422C75" stroke-width="1.1" opacity="0.4"/>
+      <line x1="361" y1="232" x2="619" y2="232" stroke="#422C75" stroke-width="1.1" opacity="0.4"/>
+      <line x1="361" y1="232" x2="361" y2="255" stroke="#422C75" stroke-width="1.1" opacity="0.4"/>
+      <line x1="447" y1="232" x2="447" y2="255" stroke="#422C75" stroke-width="1.1" opacity="0.4"/>
+      <line x1="533" y1="232" x2="533" y2="255" stroke="#422C75" stroke-width="1.1" opacity="0.4"/>
+      <line x1="619" y1="232" x2="619" y2="255" stroke="#FF2F69" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.8"/>
+      <line x1="1030" y1="88" x2="1030" y2="110" stroke="#422C75" stroke-width="1.3" opacity="0.45"/>
+      <line x1="830" y1="110" x2="1230" y2="110" stroke="#422C75" stroke-width="1.3" opacity="0.45"/>
+      <line x1="830" y1="110" x2="830" y2="114" stroke="#422C75" stroke-width="1.3" opacity="0.45"/>
+      <line x1="1030" y1="110" x2="1030" y2="114" stroke="#422C75" stroke-width="1.3" opacity="0.45"/>
+      <line x1="1230" y1="110" x2="1230" y2="114" stroke="#422C75" stroke-width="1.3" opacity="0.45"/>
+      <line x1="830" y1="184" x2="830" y2="255" stroke="#422C75" stroke-width="1.1" opacity="0.4"/>
+      <line x1="830" y1="333" x2="830" y2="365" stroke="#422C75" stroke-width="1.1" opacity="0.4"/>
+      <line x1="830" y1="457" x2="830" y2="475" stroke="#FF2F69" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.8"/>
+      <line x1="1030" y1="184" x2="1030" y2="255" stroke="#422C75" stroke-width="1.1" opacity="0.4"/>
+      <line x1="1030" y1="333" x2="1030" y2="365" stroke="#FF2F69" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.8"/>
+      <line x1="1230" y1="184" x2="1230" y2="255" stroke="#422C75" stroke-width="1.1" opacity="0.4"/>
+      <line x1="1230" y1="333" x2="1230" y2="365" stroke="#422C75" stroke-width="1.1" opacity="0.4"/>
+      <line x1="1230" y1="443" x2="1230" y2="455" stroke="#422C75" stroke-width="1.1" opacity="0.4"/>
+      <line x1="1144" y1="455" x2="1316" y2="455" stroke="#422C75" stroke-width="1.1" opacity="0.4"/>
+      <line x1="1144" y1="455" x2="1144" y2="467" stroke="#422C75" stroke-width="1.1" opacity="0.4"/>
+      <line x1="1230" y1="455" x2="1230" y2="467" stroke="#422C75" stroke-width="1.1" opacity="0.4"/>
+      <line x1="1316" y1="455" x2="1316" y2="467" stroke="#422C75" stroke-width="1.1" opacity="0.4"/>
+      <text x="330" y="11" text-anchor="middle" fill="#422C75" font-size="7.5" font-weight="700" letter-spacing="0.8" opacity="0.38">INTRALOGÍSTICA — VENDEMMIA</text>
+      <rect x="180" y="18" width="300" height="70" rx="12" fill="#422C75"/>
+      <text x="330" y="44" text-anchor="middle" fill="#FFFCF8" font-size="14" font-weight="700">DERIK SEVERINO</text>
+      <text x="330" y="62" text-anchor="middle" fill="#FFFCF8" font-size="10.5" opacity="0.85">Gestor de Projetos e TI</text>
+      <line x1="198" y1="69" x2="462" y2="69" stroke="#FFFCF8" stroke-width="0.5" opacity="0.22"/>
+      <text x="330" y="80" text-anchor="middle" fill="#FFFCF8" font-size="8.5" opacity="0.55">Intralogística</text>
+      <rect x="88" y="114" width="165" height="70" rx="10" fill="#422C75"/>
+      <text x="170" y="134" text-anchor="middle" fill="#FFFCF8" font-size="9" font-weight="700">SISTEMAS LOGÍSTICOS</text>
+      <line x1="106" y1="142" x2="236" y2="142" stroke="#FFFCF8" stroke-width="0.7" opacity="0.35"/>
+      <text x="170" y="163" text-anchor="middle" fill="#FFFCF8" font-size="10" opacity="0.62">Área de T&amp;I</text>
+      <rect x="408" y="114" width="165" height="70" rx="10" fill="#422C75"/>
+      <text x="490" y="134" text-anchor="middle" fill="#FFFCF8" font-size="9" font-weight="700">PROJETOS</text>
+      <line x1="426" y1="142" x2="556" y2="142" stroke="#FFFCF8" stroke-width="0.7" opacity="0.35"/>
+      <text x="490" y="163" text-anchor="middle" fill="#FFFCF8" font-size="10" opacity="0.62">Área de Projetos</text>
+      <rect x="88" y="255" width="165" height="78" rx="10" fill="#FFFCF8" stroke="#422C75" stroke-width="1.3" stroke-opacity="0.55"/>
+      <text x="170" y="281" text-anchor="middle" fill="#422C75" font-size="12" font-weight="700">Renato Adriano</text>
+      <text x="170" y="299" text-anchor="middle" fill="#FF2F69" font-size="10">Supervisor de TI</text>
+      <line x1="106" y1="308" x2="236" y2="308" stroke="#422C75" stroke-width="0.6" opacity="0.22"/>
+      <text x="170" y="320" text-anchor="middle" fill="#422C75" font-size="8.5" opacity="0.7">▸ Todos os CDs</text>
+      <rect x="88" y="365" width="165" height="78" rx="10" fill="#FFFCF8" stroke="#422C75" stroke-width="1.3" stroke-opacity="0.55"/>
+      <text x="170" y="391" text-anchor="middle" fill="#422C75" font-size="12" font-weight="700">João Guilherme</text>
+      <text x="170" y="409" text-anchor="middle" fill="#FF2F69" font-size="10">Analista de Sistemas</text>
+      <line x1="106" y1="418" x2="236" y2="418" stroke="#422C75" stroke-width="0.6" opacity="0.22"/>
+      <text x="170" y="430" text-anchor="middle" fill="#422C75" font-size="8.5" opacity="0.7">▸ Todos os CDs</text>
+      <rect x="88" y="475" width="165" height="82" rx="10" fill="#FFFCF8" stroke="#FF2F69" stroke-width="1.2" stroke-dasharray="5,3"/>
+      <text x="170" y="503" text-anchor="middle" fill="#422C75" font-size="12" font-weight="700">Kaique de Souza</text>
+      <text x="170" y="519" text-anchor="middle" fill="#FF2F69" font-size="9.5">Jovem Aprendiz</text>
+      <line x1="106" y1="527" x2="234" y2="527" stroke="#FF2F69" stroke-width="0.6" opacity="0.3"/>
+      <text x="170" y="539" text-anchor="middle" fill="#422C75" font-size="8" opacity="0.7">▸ Todos os CDs</text>
+      <rect x="320" y="255" width="82" height="92" rx="10" fill="#FFFCF8" stroke="#422C75" stroke-width="1.3" stroke-opacity="0.55"/>
+      <text x="361" y="267" text-anchor="middle" fill="#422C75" font-size="10" font-weight="700">Vladson</text>
+      <text x="361" y="279" text-anchor="middle" fill="#422C75" font-size="10" font-weight="700">Teixeira</text>
+      <text x="361" y="292" text-anchor="middle" fill="#FF2F69" font-size="9">Analista de</text>
+      <text x="361" y="304" text-anchor="middle" fill="#FF2F69" font-size="9">Projetos</text>
+      <line x1="330" y1="311" x2="392" y2="311" stroke="#422C75" stroke-width="0.6" opacity="0.22"/>
+      <text x="361" y="323" text-anchor="middle" fill="#422C75" font-size="8" opacity="0.7">▸ Nav. CD1</text>
+      <rect x="406" y="255" width="82" height="92" rx="10" fill="#FFFCF8" stroke="#422C75" stroke-width="1.3" stroke-opacity="0.55"/>
+      <text x="447" y="267" text-anchor="middle" fill="#FF2F69" font-size="10" font-weight="700">Em</text>
+      <text x="447" y="279" text-anchor="middle" fill="#FF2F69" font-size="10" font-weight="700">contratação</text>
+      <text x="447" y="292" text-anchor="middle" fill="#422C75" font-size="9">Analista de</text>
+      <text x="447" y="304" text-anchor="middle" fill="#422C75" font-size="9">Projetos JR</text>
+      <line x1="416" y1="311" x2="478" y2="311" stroke="#422C75" stroke-width="0.6" opacity="0.22"/>
+      <text x="447" y="323" text-anchor="middle" fill="#422C75" font-size="8" opacity="0.7">▸ Itapevi</text>
+      <rect x="492" y="255" width="82" height="92" rx="10" fill="#FFFCF8" stroke="#422C75" stroke-width="1.3" stroke-opacity="0.55"/>
+      <text x="533" y="267" text-anchor="middle" fill="#422C75" font-size="10" font-weight="700">Gabriel</text>
+      <text x="533" y="279" text-anchor="middle" fill="#422C75" font-size="10" font-weight="700">Cipriani</text>
+      <text x="533" y="292" text-anchor="middle" fill="#FF2F69" font-size="9">Analista de</text>
+      <text x="533" y="304" text-anchor="middle" fill="#FF2F69" font-size="9">Qualidade</text>
+      <line x1="502" y1="311" x2="564" y2="311" stroke="#422C75" stroke-width="0.6" opacity="0.22"/>
+      <text x="533" y="323" text-anchor="middle" fill="#422C75" font-size="8" opacity="0.7">▸ Nav. CD2</text>
+      <rect x="578" y="255" width="82" height="92" rx="10" fill="#FFFCF8" stroke="#FF2F69" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <text x="619" y="267" text-anchor="middle" fill="#FF2F69" font-size="10" font-weight="700">Nova Vaga</text>
+      <text x="619" y="279" text-anchor="middle" fill="#FF2F69" font-size="10" font-weight="700">Futura</text>
+      <text x="619" y="292" text-anchor="middle" fill="#422C75" font-size="9">Assistente</text>
+      <text x="619" y="304" text-anchor="middle" fill="#422C75" font-size="9">de Projetos</text>
+      <line x1="588" y1="311" x2="650" y2="311" stroke="#422C75" stroke-width="0.6" opacity="0.22"/>
+      <text x="619" y="323" text-anchor="middle" fill="#422C75" font-size="8" opacity="0.7">▸ Garuva</text>
+      <text x="1030" y="11" text-anchor="middle" fill="#422C75" font-size="7.5" font-weight="700" letter-spacing="0.8" opacity="0.38">VENDEMMIA COMÉRCIO</text>
+      <rect x="880" y="18" width="300" height="70" rx="12" fill="#422C75"/>
+      <text x="1030" y="44" text-anchor="middle" fill="#FFFCF8" font-size="14" font-weight="700">GUEILEE PEREIRA</text>
+      <text x="1030" y="62" text-anchor="middle" fill="#FFFCF8" font-size="10.5" opacity="0.85">Gestor de Projetos, TI e Qualidade</text>
+      <line x1="898" y1="69" x2="1162" y2="69" stroke="#FFFCF8" stroke-width="0.5" opacity="0.22"/>
+      <text x="1030" y="80" text-anchor="middle" fill="#FFFCF8" font-size="8.5" opacity="0.55">Vendemmia Comércio</text>
+      <rect x="748" y="114" width="165" height="70" rx="10" fill="#422C75"/>
+      <text x="830" y="127" text-anchor="middle" fill="#FFFCF8" font-size="8.5" font-weight="700" letter-spacing="0.3">TECNOLOGIA</text>
+      <text x="830" y="138" text-anchor="middle" fill="#FFFCF8" font-size="8.5" font-weight="700" letter-spacing="0.3">E INOVAÇÃO</text>
+      <line x1="766" y1="146" x2="896" y2="146" stroke="#FFFCF8" stroke-width="0.7" opacity="0.35"/>
+      <text x="830" y="165" text-anchor="middle" fill="#FFFCF8" font-size="10" opacity="0.62">Área de T&amp;I</text>
+      <rect x="748" y="255" width="165" height="78" rx="10" fill="#FFFCF8" stroke="#422C75" stroke-width="1.3" stroke-opacity="0.55"/>
+      <text x="830" y="281" text-anchor="middle" fill="#422C75" font-size="12" font-weight="700">Lucas Souza</text>
+      <text x="830" y="299" text-anchor="middle" fill="#FF2F69" font-size="10">Analista de T&amp;I</text>
+      <line x1="766" y1="308" x2="896" y2="308" stroke="#422C75" stroke-width="0.6" opacity="0.22"/>
+      <text x="830" y="320" text-anchor="middle" fill="#422C75" font-size="8.5" opacity="0.7">▸ CD Itapevi</text>
+      <rect x="748" y="365" width="165" height="92" rx="10" fill="#FFFCF8" stroke="#422C75" stroke-width="1.3" stroke-opacity="0.55"/>
+      <text x="830" y="389" text-anchor="middle" fill="#422C75" font-size="12" font-weight="700">Terabyte</text>
+      <text x="830" y="406" text-anchor="middle" fill="#FF2F69" font-size="10">Fornecedor</text>
+      <line x1="766" y1="414" x2="896" y2="414" stroke="#422C75" stroke-width="0.6" opacity="0.22"/>
+      <text x="830" y="427" text-anchor="middle" fill="#422C75" font-size="8.5" opacity="0.7">▸ CD Itapevi</text>
+      <text x="830" y="441" text-anchor="middle" fill="#422C75" font-size="8.5" opacity="0.7">▸ Vendemmia Comércio</text>
+      <rect x="748" y="475" width="165" height="92" rx="10" fill="#FFFCF8" stroke="#FF2F69" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <text x="830" y="495" text-anchor="middle" fill="#FF2F69" font-size="11" font-weight="700">Novo Fornecedor</text>
+      <text x="830" y="509" text-anchor="middle" fill="#FF2F69" font-size="11" font-weight="700">Futuro</text>
+      <line x1="766" y1="518" x2="896" y2="518" stroke="#422C75" stroke-width="0.6" opacity="0.22"/>
+      <text x="830" y="531" text-anchor="middle" fill="#422C75" font-size="8.5" opacity="0.7">Fornecedor</text>
+      <line x1="766" y1="539" x2="896" y2="539" stroke="#422C75" stroke-width="0.6" opacity="0.12"/>
+      <text x="830" y="552" text-anchor="middle" fill="#422C75" font-size="8.5" opacity="0.7">▸ CDs de Santa Catarina</text>
+      <rect x="948" y="114" width="165" height="70" rx="10" fill="#422C75"/>
+      <text x="1030" y="134" text-anchor="middle" fill="#FFFCF8" font-size="9" font-weight="700">PROJETOS</text>
+      <line x1="966" y1="142" x2="1096" y2="142" stroke="#FFFCF8" stroke-width="0.7" opacity="0.35"/>
+      <text x="1030" y="163" text-anchor="middle" fill="#FFFCF8" font-size="10" opacity="0.62">Área de Projetos</text>
+      <rect x="948" y="255" width="165" height="78" rx="10" fill="#FFFCF8" stroke="#FF2F69" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <text x="1030" y="278" text-anchor="middle" fill="#FF2F69" font-size="11" font-weight="700">Nova Vaga</text>
+      <text x="1030" y="294" text-anchor="middle" fill="#FF2F69" font-size="10" font-weight="700">Futura</text>
+      <line x1="966" y1="302" x2="1096" y2="302" stroke="#422C75" stroke-width="0.6" opacity="0.22"/>
+      <text x="1030" y="315" text-anchor="middle" fill="#422C75" font-size="8.5" opacity="0.7">Assistente de Projetos</text>
+      <rect x="941" y="358" width="179" height="92" rx="12" fill="#FF2F69" opacity="0.08"/>
+      <rect x="992" y="351" width="76" height="17" rx="8" fill="#FF2F69"/>
+      <text x="1030" y="363" text-anchor="middle" fill="#FFFCF8" font-size="7.5" font-weight="700" letter-spacing="0.6">PMO</text>
+      <rect x="948" y="365" width="165" height="78" rx="10" fill="#FFFCF8" stroke="#FF2F69" stroke-width="2"/>
+      <text x="1030" y="391" text-anchor="middle" fill="#422C75" font-size="12" font-weight="700">Millena Ferreira</text>
+      <text x="1030" y="409" text-anchor="middle" fill="#FF2F69" font-size="10">Analista de Projetos</text>
+      <line x1="966" y1="418" x2="1096" y2="418" stroke="#FF2F69" stroke-width="0.6" opacity="0.3"/>
+      <text x="1030" y="430" text-anchor="middle" fill="#422C75" font-size="8.5" opacity="0.7">▸ PMO · Todas as áreas</text>
+      <line x1="913" y1="404" x2="948" y2="404" stroke="#FF2F69" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.7"/>
+      <line x1="1113" y1="404" x2="1148" y2="404" stroke="#FF2F69" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.7"/>
+      <rect x="1148" y="114" width="165" height="70" rx="10" fill="#422C75"/>
+      <text x="1230" y="134" text-anchor="middle" fill="#FFFCF8" font-size="9" font-weight="700">QUALIDADE</text>
+      <line x1="1166" y1="142" x2="1296" y2="142" stroke="#FFFCF8" stroke-width="0.7" opacity="0.35"/>
+      <text x="1230" y="163" text-anchor="middle" fill="#FFFCF8" font-size="10" opacity="0.62">Área de Qualidade</text>
+      <rect x="1148" y="255" width="165" height="78" rx="10" fill="#FFFCF8" stroke="#422C75" stroke-width="1.3" stroke-opacity="0.55"/>
+      <text x="1230" y="281" text-anchor="middle" fill="#422C75" font-size="12" font-weight="700">Carol Pereira</text>
+      <text x="1230" y="299" text-anchor="middle" fill="#FF2F69" font-size="10">Analista de Qualidade</text>
+      <line x1="1166" y1="308" x2="1296" y2="308" stroke="#422C75" stroke-width="0.6" opacity="0.22"/>
+      <rect x="1148" y="365" width="165" height="78" rx="10" fill="#FFFCF8" stroke="#422C75" stroke-width="1.3" stroke-opacity="0.55"/>
+      <text x="1230" y="391" text-anchor="middle" fill="#422C75" font-size="12" font-weight="700">Marina Cardoso</text>
+      <text x="1230" y="409" text-anchor="middle" fill="#FF2F69" font-size="10">Farmacêutica</text>
+      <line x1="1166" y1="418" x2="1296" y2="418" stroke="#422C75" stroke-width="0.6" opacity="0.22"/>
+      <text x="1230" y="463" text-anchor="middle" fill="#422C75" font-size="7" font-weight="700" letter-spacing="0.5" opacity="0.4">RESPONSÁVEIS TÉCNICAS</text>
+      <rect x="1103" y="467" width="82" height="92" rx="10" fill="#FFFCF8" stroke="#422C75" stroke-width="1.3" stroke-opacity="0.55"/>
+      <text x="1144" y="487" text-anchor="middle" fill="#422C75" font-size="10" font-weight="700">Química</text>
+      <text x="1144" y="501" text-anchor="middle" fill="#FF2F69" font-size="9">Resp. Técnica</text>
+      <line x1="1113" y1="509" x2="1175" y2="509" stroke="#422C75" stroke-width="0.6" opacity="0.22"/>
+      <text x="1144" y="522" text-anchor="middle" fill="#422C75" font-size="8" opacity="0.7">▸ Santa Catarina</text>
+      <rect x="1189" y="467" width="82" height="92" rx="10" fill="#FFFCF8" stroke="#422C75" stroke-width="1.3" stroke-opacity="0.55"/>
+      <text x="1230" y="487" text-anchor="middle" fill="#422C75" font-size="10" font-weight="700">Química</text>
+      <text x="1230" y="501" text-anchor="middle" fill="#FF2F69" font-size="9">Resp. Técnica</text>
+      <line x1="1199" y1="509" x2="1261" y2="509" stroke="#422C75" stroke-width="0.6" opacity="0.22"/>
+      <text x="1230" y="522" text-anchor="middle" fill="#422C75" font-size="8" opacity="0.7">▸ São Paulo</text>
+      <rect x="1275" y="467" width="82" height="92" rx="10" fill="#FFFCF8" stroke="#422C75" stroke-width="1.3" stroke-opacity="0.55"/>
+      <text x="1316" y="487" text-anchor="middle" fill="#422C75" font-size="10" font-weight="700">Anvisa</text>
+      <text x="1316" y="501" text-anchor="middle" fill="#FF2F69" font-size="9">Resp. Técnica</text>
+      <line x1="1285" y1="509" x2="1347" y2="509" stroke="#422C75" stroke-width="0.6" opacity="0.22"/>
+      <text x="1316" y="522" text-anchor="middle" fill="#422C75" font-size="8" opacity="0.7">▸ São Paulo</text>
+
+      <!-- Clickable overlays for each person box -->
+      <g id="svg-hotspots" style="cursor:pointer">
+        <!-- Derik index=0 -->
+        <rect x="180" y="18" width="300" height="70" rx="10" fill="transparent" onclick="openModalByIndex(0)">
+          <title>Derik Severino — clique para ver atividades</title>
+        </rect>
+        <!-- Renato index=1 -->
+        <rect x="88" y="255" width="165" height="78" rx="8" fill="transparent" onclick="openModalByIndex(1)">
+          <title>Renato Adriano</title>
+        </rect>
+        <!-- João index=2 -->
+        <rect x="88" y="365" width="165" height="78" rx="8" fill="transparent" onclick="openModalByIndex(2)">
+          <title>João Guilherme</title>
+        </rect>
+        <!-- Vladson index=3 -->
+        <rect x="320" y="255" width="82" height="92" rx="8" fill="transparent" onclick="openModalByIndex(3)">
+          <title>Vladson Teixeira</title>
+        </rect>
+        <!-- Gabriel index=4 -->
+        <rect x="492" y="255" width="82" height="92" rx="8" fill="transparent" onclick="openModalByIndex(4)">
+          <title>Gabriel Cipriani</title>
+        </rect>
+        <!-- Kaique index=5 -->
+        <rect x="88" y="475" width="165" height="82" rx="8" fill="transparent" onclick="openModalByIndex(5)">
+          <title>Kaique de Souza</title>
+        </rect>
+        <!-- Gueilee index=6 -->
+        <rect x="880" y="18" width="300" height="70" rx="10" fill="transparent" onclick="openModalByIndex(6)">
+          <title>Gueilee Pereira</title>
+        </rect>
+        <!-- Lucas index=7 -->
+        <rect x="748" y="255" width="165" height="78" rx="8" fill="transparent" onclick="openModalByIndex(7)">
+          <title>Lucas Souza</title>
+        </rect>
+        <!-- Carol index=8 -->
+        <rect x="1148" y="255" width="165" height="78" rx="8" fill="transparent" onclick="openModalByIndex(8)">
+          <title>Carol Pereira</title>
+        </rect>
+        <!-- Marina index=9 -->
+        <rect x="1148" y="365" width="165" height="78" rx="8" fill="transparent" onclick="openModalByIndex(9)">
+          <title>Marina Cardoso</title>
+        </rect>
+        <!-- Millena index=10 -->
+        <rect x="948" y="358" width="165" height="85" rx="8" fill="transparent" onclick="openModalByIndex(10)">
+          <title>Millena Ferreira</title>
+        </rect>
+        <!-- Em contratação index=11 -->
+        <rect x="406" y="255" width="82" height="92" rx="10" fill="transparent" onclick="openModalByIndex(11)">
+          <title>Em contratação — Analista de Projetos JR</title>
+        </rect>
+        <!-- Nova Vaga Futura (Garuva) index=12 -->
+        <rect x="578" y="255" width="82" height="92" rx="10" fill="transparent" onclick="openModalByIndex(12)">
+          <title>Nova Vaga Futura — Assistente de Projetos</title>
+        </rect>
+        <!-- Terabyte index=13 -->
+        <rect x="748" y="365" width="165" height="92" rx="10" fill="transparent" onclick="openModalByIndex(13)">
+          <title>Terabyte — Fornecedor</title>
+        </rect>
+        <!-- Novo Fornecedor Futuro index=14 -->
+        <rect x="748" y="475" width="165" height="92" rx="10" fill="transparent" onclick="openModalByIndex(14)">
+          <title>Novo Fornecedor Futuro</title>
+        </rect>
+        <!-- Nova Vaga Futura (comércio) index=15 -->
+        <rect x="948" y="255" width="165" height="78" rx="10" fill="transparent" onclick="openModalByIndex(15)">
+          <title>Nova Vaga Futura — Assistente de Projetos</title>
+        </rect>
+        <!-- Química Santa Catarina index=16 -->
+        <rect x="1103" y="467" width="82" height="92" rx="10" fill="transparent" onclick="openModalByIndex(16)">
+          <title>Química — Responsável Técnica (Santa Catarina)</title>
+        </rect>
+        <!-- Química São Paulo index=17 -->
+        <rect x="1189" y="467" width="82" height="92" rx="10" fill="transparent" onclick="openModalByIndex(17)">
+          <title>Química — Responsável Técnica (São Paulo)</title>
+        </rect>
+        <!-- Anvisa index=18 -->
+        <rect x="1275" y="467" width="82" height="92" rx="10" fill="transparent" onclick="openModalByIndex(18)">
+          <title>Anvisa — Responsável Técnica</title>
+        </rect>
+      </g>
+    </svg>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-accent" id="modal-accent"></div>
+    <div class="modal-top">
+      <div class="modal-area-row">
+        <span class="modal-badge" id="modal-badge"></span>
+        <div class="modal-top-actions">
+          <button class="icon-btn" id="editBtn" onclick="enterEditMode()">✎ Editar</button>
+          <button class="icon-btn save" id="saveBtn" style="display:none" onclick="saveEdits()">💾 Salvar</button>
+          <button class="icon-btn cancel" id="cancelBtn" style="display:none" onclick="cancelEdits()">Cancelar</button>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+      </div>
+      <div class="modal-person-row">
+        <div class="modal-avatar" id="modal-avatar"></div>
+        <div>
+          <div class="modal-name" id="modal-name"></div>
+          <div class="modal-role" id="modal-role"></div>
+          <div class="modal-loc" id="modal-loc"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-desc-wrap" id="modal-desc-wrap">
+        <div class="modal-desc-lbl">Descrição do cargo</div>
+        <p class="modal-desc" id="modal-desc"></p>
+      </div>
+      <div class="modal-acts-lbl">
+        <span>Principais atividades</span>
+        <button class="add-act-btn" onclick="addActivity()">+ adicionar</button>
+      </div>
+      <ul class="modal-acts-list" id="modal-acts"></ul>
+      <div class="edit-hint">Clique no texto para editar. Enter cria uma nova linha, Backspace no início junta com a anterior.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+  <span id="toast-text">Alterações salvas</span>
+</div>
+
+<footer>Vendemmia Comércio Internacional &nbsp;·&nbsp; Gestão de Projetos e TI &nbsp;·&nbsp; 2026</footer>
+
+<script>
+const people = [
+  {
+    name:"Derik Severino", role:"Gestor de Projetos e TI", loc:"Todos os CDs",
+    area:"GESTÃO", color:"#422C75", group:"intra", desc:"",
+    acts:["Estratégia e direcionamento da área","Gestão e desenvolvimento de equipe","Portfólio e priorização de projetos","Relacionamento com clientes e diretoria","Indicadores, orçamento e governança"]
+  },
+  {
+    name:"Renato Adriano", role:"Supervisor de TI", loc:"Todos os CDs",
+    area:"SIST. LOGÍSTICOS", color:"#422C75", group:"intra", desc:"",
+    acts:["Gestão da equipe de TI","Sustentação e evolução do WMS","Integrações sistêmicas","Infraestrutura e atendimento N2/N3","Arquitetura de soluções","Segurança da informação e controle de acessos","Gestão de fornecedores e contratos de TI"]
+  },
+  {
+    name:"João Guilherme", role:"Analista de Sistemas", loc:"Todos os CDs",
+    area:"SIST. LOGÍSTICOS", color:"#422C75", group:"intra", desc:"",
+    acts:["Suporte funcional ao sistema","Parametrizações e configurações","Testes e homologações","Levantamento técnico de requisitos","Atendimento aos usuários","Integrações sistêmicas","Treinamento e capacitação de usuários no WMS"]
+  },
+  {
+    name:"Vladson Teixeira", role:"Analista de Projetos", loc:"Navegantes CD1",
+    area:"PROJETOS", color:"#FF2F69", group:"intra", desc:"",
+    acts:["Gestão de projetos","Implantação de melhorias operacionais","Acompanhamento de cronogramas","Interface com operações e clientes","Melhoria contínua de processos","Qualidade e mapeamento operacional","Indicadores de eficiência","Elaboração de POPs e procedimentos","Análise de causa raiz e planos de ação","Elaboração de layouts e desenhos operacionais","Dimensionamento de recursos e capacidade operacional"]
+  },
+  {
+    name:"Gabriel Cipriani", role:"Analista de Projetos", loc:"Navegantes CD2",
+    area:"PROJETOS", color:"#FF2F69", group:"intra", desc:"",
+    acts:["Gestão de projetos","Implantação de melhorias operacionais","Acompanhamento de cronogramas","Interface com operações e clientes","Melhoria contínua de processos","Qualidade e mapeamento operacional","Indicadores de eficiência","Elaboração de POPs e procedimentos","Análise de causa raiz e planos de ação","Elaboração de layouts e desenhos operacionais","Dimensionamento de recursos e capacidade operacional"]
+  },
+  {
+    name:"Kaique de Souza", role:"Jovem Aprendiz", loc:"Todos os CDs",
+    area:"APOIO", color:"#422C75", group:"intra", desc:"",
+    acts:["Apoio administrativo geral","Atualização de controles e planilhas","Documentação e registros","Organização de informações","Suporte às equipes de TI e Projetos"]
+  },
+  {
+    name:"Gueilee Pereira", role:"Gestor de Projetos, TI e Qualidade", loc:"Todos os CDs",
+    area:"GESTÃO", color:"#422C75", group:"comercio", desc:"",
+    acts:["Gestão estratégica das áreas de Projetos, TI e Qualidade","Relacionamento com clientes e parceiros","Governança e indicadores de desempenho","Gestão e desenvolvimento de equipe","Interface com operações e diretoria","Definição de prioridades e roadmap das áreas"]
+  },
+  {
+    name:"Lucas Souza", role:"Analista de T&I", loc:"CD Itapevi",
+    area:"T&I", color:"#422C75", group:"comercio", desc:"",
+    acts:["Suporte técnico diário às operações","Automação de processos e relatórios","Gestão de ferramentas e sistemas internos","Manutenção e atualização de infraestrutura","Desenvolvimento de soluções de automação","Controle e monitoramento de sistemas locais"]
+  },
+  {
+    name:"Carol Pereira", role:"Analista de Qualidade", loc:"Vendemmia Comércio",
+    area:"QUALIDADE", color:"#422C75", group:"comercio", desc:"",
+    acts:["Gestão do sistema de qualidade","Auditorias internas e externas","Indicadores de qualidade e não-conformidades","Elaboração e revisão de procedimentos","Treinamento e capacitação em qualidade","Acompanhamento de planos de ação corretiva","Controle de documentos e registros de qualidade"]
+  },
+  {
+    name:"Marina Cardoso", role:"Farmacêutica", loc:"Vendemmia Comércio",
+    area:"QUALIDADE", color:"#422C75", group:"comercio", desc:"",
+    acts:["Responsabilidade técnica farmacêutica","Conformidade com exigências da Anvisa","Gestão de documentação regulatória","Controle de produtos com restrição regulatória","Interface com responsáveis técnicas regionais","Acompanhamento de laudos e certificações","Orientação técnica sobre armazenagem de fármacos"]
+  },
+  {
+    name:"Millena Ferreira", role:"Analista de Projetos · PMO", loc:"Todas as áreas",
+    area:"PMO", color:"#FF2F69", group:"comercio", pmo:true,
+    desc:"Definir, manter e disseminar a metodologia de gerenciamento de projetos, apoiar gestores e equipes na aplicação dos processos e artefatos da metodologia, monitorar indicadores, riscos, cronogramas e a saúde do portfólio de projetos. Conduzir os ritos de governança e reportar o status dos projetos a liderança.",
+    acts:["PMO — gestão de portfólio de projetos","Governança e padronização de processos de projetos","Monitoramento de cronogramas e entregas","Acompanhamento de indicadores e KPIs","Facilitação de rituais de gestão (reuniões, reviews)","Elaboração de relatórios e dashboards gerenciais","Gestão de riscos e impedimentos","Interface entre áreas: TI, Projetos e Operações","Melhoria contínua de metodologias de projetos"]
+  },
+  {
+    name:"Em contratação", role:"Analista de Projetos JR", loc:"Itapevi",
+    area:"PROJETOS", color:"#FF2F69", group:"intra", desc:"",
+    acts:[]
+  },
+  {
+    name:"Nova Vaga Futura", role:"Assistente de Projetos", loc:"Garuva",
+    area:"PROJETOS", color:"#FF2F69", group:"intra", desc:"",
+    acts:[]
+  },
+  {
+    name:"Terabyte", role:"Fornecedor", loc:"CD Itapevi · Vendemmia Comércio",
+    area:"FORNECEDOR", color:"#422C75", group:"comercio", desc:"",
+    acts:[]
+  },
+  {
+    name:"Novo Fornecedor Futuro", role:"Fornecedor", loc:"CDs de Santa Catarina",
+    area:"FORNECEDOR", color:"#422C75", group:"comercio", desc:"",
+    acts:[]
+  },
+  {
+    name:"Nova Vaga Futura", role:"Assistente de Projetos", loc:"A definir",
+    area:"PROJETOS", color:"#FF2F69", group:"comercio", desc:"",
+    acts:[]
+  },
+  {
+    name:"Química", role:"Responsável Técnica", loc:"Santa Catarina",
+    area:"QUALIDADE", color:"#422C75", group:"comercio", desc:"",
+    acts:[]
+  },
+  {
+    name:"Química", role:"Responsável Técnica", loc:"São Paulo",
+    area:"QUALIDADE", color:"#422C75", group:"comercio", desc:"",
+    acts:[]
+  },
+  {
+    name:"Anvisa", role:"Responsável Técnica", loc:"São Paulo",
+    area:"QUALIDADE", color:"#422C75", group:"comercio", desc:"",
+    acts:[]
+  }
+];
+
+/* ===== Persist edited fields in the browser ===== */
+const OVERRIDES_KEY = 'vendemmiaOrgOverrides_v1';
+function loadOverrides(){
+  try{ return JSON.parse(localStorage.getItem(OVERRIDES_KEY)) || {}; }
+  catch(e){ return {}; }
+}
+function saveOverrides(o){
+  try{ localStorage.setItem(OVERRIDES_KEY, JSON.stringify(o)); }catch(e){}
+}
+const overrides = loadOverrides();
+people.forEach((p,i)=>{
+  const o = overrides[i];
+  if(!o) return;
+  if(o.acts) p.acts = o.acts;
+  if(typeof o.name === 'string') p.name = o.name;
+  if(typeof o.role === 'string') p.role = o.role;
+  if(typeof o.loc === 'string') p.loc = o.loc;
+  if(typeof o.desc === 'string') p.desc = o.desc;
+});
+
+function initials(name){
+  return name.split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+}
+
+let activeCard = null;
+let currentIndex = null;
+
+function openModalByIndex(i){
+  openModal(i, null);
+}
+
+function renderModalFields(p){
+  document.getElementById('modal-name').textContent = p.name;
+  document.getElementById('modal-role').textContent = p.role;
+  document.getElementById('modal-loc').textContent = '▸ ' + p.loc;
+  document.getElementById('modal-desc').textContent = p.desc || '';
+  updateDescVisibility();
+}
+
+function renderActs(acts){
+  document.getElementById('modal-acts').innerHTML = acts.map(a=>`<li>${a}</li>`).join('');
+}
+
+function updateDescVisibility(){
+  const modal = document.getElementById('modal');
+  const wrap = document.getElementById('modal-desc-wrap');
+  const descEl = document.getElementById('modal-desc');
+  const editing = modal.classList.contains('editing');
+  wrap.style.display = (editing || descEl.textContent.trim() !== '') ? 'block' : 'none';
+}
+
+function openModal(i, card){
+  cancelEdits(true);
+  currentIndex = i;
+  const p = people[i];
+
+  if(activeCard) activeCard.classList.remove('active');
+  activeCard = card || null;
+  if(activeCard) activeCard.classList.add('active');
+
+  document.getElementById('modal-accent').style.background = p.color;
+  document.getElementById('modal-badge').style.background = p.color;
+  document.getElementById('modal-badge').textContent = p.area;
+  document.getElementById('modal-avatar').style.background = p.color;
+  document.getElementById('modal-avatar').textContent = initials(p.name);
+  renderModalFields(p);
+  renderActs(p.acts);
+
+  document.getElementById('overlay').classList.add('show');
+}
+
+function closeModal(e){
+  if(e && e.target !== document.getElementById('overlay')) return;
+  cancelEdits(true);
+  document.getElementById('overlay').classList.remove('show');
+  if(activeCard){ activeCard.classList.remove('active'); activeCard=null; }
+}
+
+/* ===== Edit mode ===== */
+function enterEditMode(){
+  const modal = document.getElementById('modal');
+  modal.classList.add('editing');
+  document.getElementById('modal-acts').setAttribute('contenteditable','true');
+  document.getElementById('modal-name').setAttribute('contenteditable','true');
+  document.getElementById('modal-role').setAttribute('contenteditable','true');
+  document.getElementById('modal-loc').setAttribute('contenteditable','true');
+  document.getElementById('modal-desc').setAttribute('contenteditable','true');
+  document.getElementById('editBtn').style.display = 'none';
+  document.getElementById('saveBtn').style.display = 'inline-flex';
+  document.getElementById('cancelBtn').style.display = 'inline-flex';
+  updateDescVisibility();
+  document.getElementById('modal-name').focus();
+}
+
+function exitEditMode(){
+  const modal = document.getElementById('modal');
+  modal.classList.remove('editing');
+  document.getElementById('modal-acts').removeAttribute('contenteditable');
+  document.getElementById('modal-name').removeAttribute('contenteditable');
+  document.getElementById('modal-role').removeAttribute('contenteditable');
+  document.getElementById('modal-loc').removeAttribute('contenteditable');
+  document.getElementById('modal-desc').removeAttribute('contenteditable');
+  document.getElementById('editBtn').style.display = 'inline-flex';
+  document.getElementById('saveBtn').style.display = 'none';
+  document.getElementById('cancelBtn').style.display = 'none';
+  updateDescVisibility();
+}
+
+function addActivity(){
+  const ul = document.getElementById('modal-acts');
+  const li = document.createElement('li');
+  li.textContent = 'Nova atividade — edite aqui';
+  ul.appendChild(li);
+  const range = document.createRange();
+  range.selectNodeContents(li);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+function saveEdits(){
+  if(currentIndex === null) return;
+  const name = document.getElementById('modal-name').textContent.trim();
+  const role = document.getElementById('modal-role').textContent.trim();
+  const loc = document.getElementById('modal-loc').textContent.trim().replace(/^▸\s*/, '');
+  const desc = document.getElementById('modal-desc').textContent.trim();
+  const items = Array.from(document.querySelectorAll('#modal-acts li'))
+    .map(li => li.textContent.trim())
+    .filter(t => t.length > 0);
+
+  people[currentIndex].name = name || people[currentIndex].name;
+  people[currentIndex].role = role || people[currentIndex].role;
+  people[currentIndex].loc = loc || people[currentIndex].loc;
+  people[currentIndex].desc = desc;
+  people[currentIndex].acts = items;
+
+  overrides[currentIndex] = { name: people[currentIndex].name, role: people[currentIndex].role, loc: people[currentIndex].loc, desc, acts: items };
+  saveOverrides(overrides);
+
+  exitEditMode();
+  document.getElementById('modal-avatar').textContent = initials(people[currentIndex].name);
+  showToast('Alterações salvas');
+}
+
+function cancelEdits(silent){
+  const modal = document.getElementById('modal');
+  if(!modal.classList.contains('editing')) return;
+  exitEditMode();
+  if(currentIndex !== null){
+    renderModalFields(people[currentIndex]);
+    renderActs(people[currentIndex].acts);
+  }
+  if(!silent) showToast('Edição cancelada');
+}
+
+let toastTimer = null;
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-text').textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> toast.classList.remove('show'), 2200);
+}
+
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+
+/* ===== Fullscreen ===== */
+function toggleFullscreen(){
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen().catch(()=>{});
+  } else {
+    document.exitFullscreen();
+  }
+}
+document.addEventListener('fullscreenchange', ()=>{
+  const label = document.getElementById('fsLabel');
+  const icon = document.getElementById('fsIcon');
+  if(document.fullscreenElement){
+    label.textContent = 'Sair da tela cheia';
+    icon.innerHTML = '<path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/>';
+  } else {
+    label.textContent = 'Tela cheia';
+    icon.innerHTML = '<path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/>';
+  }
+});
+</script>
+</body>
+</html>

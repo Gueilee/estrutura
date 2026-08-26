@@ -726,7 +726,8 @@ function closeModal(e){
 function enterEditMode(){
   const modal = document.getElementById('modal');
   modal.classList.add('editing');
-  document.getElementById('modal-acts').setAttribute('contenteditable','true');
+  const acts = document.getElementById('modal-acts');
+  acts.setAttribute('contenteditable','true');
   document.getElementById('modal-name').setAttribute('contenteditable','true');
   document.getElementById('modal-role').setAttribute('contenteditable','true');
   document.getElementById('modal-loc').setAttribute('contenteditable','true');
@@ -735,7 +736,13 @@ function enterEditMode(){
   document.getElementById('saveBtn').style.display = 'inline-flex';
   document.getElementById('cancelBtn').style.display = 'inline-flex';
   updateDescVisibility();
-  document.getElementById('modal-name').focus();
+  // Garante que exista pelo menos um item clicável — digitar direto numa lista
+  // vazia pode inserir texto fora de um <li>, e essas atividades se perdiam ao salvar.
+  if(acts.children.length === 0){
+    addActivity();
+  } else {
+    document.getElementById('modal-name').focus();
+  }
 }
 
 function exitEditMode(){
@@ -771,8 +778,10 @@ async function saveEdits(){
   const role = document.getElementById('modal-role').textContent.trim();
   const loc = document.getElementById('modal-loc').textContent.trim().replace(/^▸\s*/, '');
   const desc = document.getElementById('modal-desc').textContent.trim();
-  const items = Array.from(document.querySelectorAll('#modal-acts li'))
-    .map(li => li.textContent.trim())
+  // Lê os filhos diretos (não só <li>) — se algum texto acabou fora de um <li>
+  // (ex.: digitado direto numa lista vazia), ele ainda é capturado aqui.
+  const items = Array.from(document.getElementById('modal-acts').childNodes)
+    .map(node => (node.textContent || '').trim())
     .filter(t => t.length > 0);
 
   people[idx].name = name || people[idx].name;

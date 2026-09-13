@@ -21,6 +21,7 @@ body{
   background:linear-gradient(180deg,#FFFCF8 0%,#F3EFFB 55%,#EFE9FA 100%);
   color:var(--ink);
   min-height:100vh;
+  display:flex;flex-direction:column;
 }
 
 /* ===== HEADER ===== */
@@ -61,7 +62,10 @@ body{
 .fs-btn svg{width:14px;height:14px;flex-shrink:0}
 
 /* ===== ORG CHART ===== */
-.org-section{padding:26px 24px 12px;max-width:1440px;margin:0 auto}
+.org-section{
+  padding:26px 24px 12px;max-width:1440px;margin:0 auto;width:100%;
+  flex:1;display:flex;flex-direction:column;justify-content:center;
+}
 .section-label{
   font-size:10.5px;font-weight:700;letter-spacing:1.2px;color:var(--purple);opacity:.5;
   text-transform:uppercase;margin-bottom:12px;
@@ -92,7 +96,7 @@ body{
 .org-card.active{border-color:var(--pink);box-shadow:0 10px 26px rgba(255,47,105,.2)}
 .org-card.manager{background:linear-gradient(135deg,var(--purple) 0%,#4E3392 100%);border-color:transparent}
 
-.org-card .card-body{display:flex;align-items:flex-start;gap:9px;pointer-events:none}
+.org-card .card-body{display:flex;align-items:flex-start;gap:9px}
 .org-card .avatar{
   width:32px;height:32px;border-radius:9px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;

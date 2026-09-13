@@ -426,8 +426,8 @@ function refreshCardDisplay(id){
 function refreshAllCards(){ Object.keys(people).forEach(refreshCardDisplay); }
 
 /* ===== Persist edited fields — shared via Supabase, cached in the browser ===== */
-const SUPABASE_URL = '';
-const SUPABASE_KEY = '';
+const SUPABASE_URL = 'https://muvdoqjngsqgzxaaxurl.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_r06mnlHLEIcSvC0F34KKIw_QC8quk-p';
 const sb = (window.supabase && SUPABASE_URL)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
   : null;

@@ -101,8 +101,10 @@ body{
   width:32px;height:32px;border-radius:9px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
   background:var(--purple);color:#FFFCF8;font-weight:700;font-size:11px;letter-spacing:.2px;
+  overflow:hidden;
 }
 .org-card.manager .avatar{background:rgba(255,255,255,.18)}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .org-card .card-info{flex:1;min-width:0}
 .org-card .card-name{font-size:12px;font-weight:700;color:var(--purple);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .org-card.manager .card-name{color:#FFFCF8}
@@ -172,7 +174,7 @@ body{
 
 .modal-person-row{display:flex;align-items:flex-start;gap:12px}
 .modal-avatar{
-  width:46px;height:46px;border-radius:13px;flex-shrink:0;
+  width:46px;height:46px;border-radius:13px;flex-shrink:0;overflow:hidden;
   display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;
 }
 .modal-person-info{flex:1;min-width:0}
@@ -321,15 +323,15 @@ footer{text-align:center;font-size:8.5px;color:var(--purple);opacity:.35;padding
 <script>
 /* ===== Estrutura organizacional (Diretoria Financeira) ===== */
 const people = {
-  'paulo-chiaradia': {parentId:null, name:'Paulo Chiaradia', role:'Diretor Financeiro', area:'DIRETORIA', loc:'', desc:'', acts:[]},
+  'paulo-chiaradia': {parentId:null, name:'Paulo Chiaradia', role:'Diretor Financeiro', area:'DIRETORIA', loc:'', desc:'', acts:[], photo:'fotos/paulo-chiaradia.jpg'},
 
-  'gueilee-pereira': {parentId:'paulo-chiaradia', name:'Gueilee Pereira', role:'Gerente de Projetos', area:'PROJETOS', loc:'', desc:'', acts:[]},
-  'caroline-oliveira': {parentId:'gueilee-pereira', name:'Caroline Oliveira', role:'Analista de Qualidade', area:'PROJETOS', loc:'', desc:'', acts:[]},
+  'gueilee-pereira': {parentId:'paulo-chiaradia', name:'Gueilee Pereira', role:'Gerente de Projetos', area:'PROJETOS', loc:'', desc:'', acts:[], photo:'fotos/gueilee-pereira.jpg'},
+  'caroline-oliveira': {parentId:'gueilee-pereira', name:'Caroline Oliveira', role:'Analista de Qualidade', area:'PROJETOS', loc:'', desc:'', acts:[], photo:'fotos/caroline-oliveira.jpg'},
   'lucas-souza': {parentId:'gueilee-pereira', name:'Lucas Souza', role:'Assistente Administrativo', area:'PROJETOS', loc:'', desc:'', acts:[]},
-  'marina-cardoso': {parentId:'gueilee-pereira', name:'Marina Cardoso', role:'Farmacêutica', area:'PROJETOS', loc:'', desc:'', acts:[]},
-  'millena-florentina': {parentId:'gueilee-pereira', name:'Millena Florentina', role:'Analista de Projetos', area:'PROJETOS', loc:'', desc:'', acts:[]},
+  'marina-cardoso': {parentId:'gueilee-pereira', name:'Marina Cardoso', role:'Farmacêutica', area:'PROJETOS', loc:'', desc:'', acts:[], photo:'fotos/marina-cardoso.jpg'},
+  'millena-florentina': {parentId:'gueilee-pereira', name:'Millena Florentina', role:'Analista de Projetos', area:'PROJETOS', loc:'', desc:'', acts:[], photo:'fotos/millena-florentina.jpg'},
 
-  'aline-farias': {parentId:'paulo-chiaradia', name:'Aline Farias', role:'Gerente de Tesouraria', area:'TESOURARIA', loc:'', desc:'', acts:[]},
+  'aline-farias': {parentId:'paulo-chiaradia', name:'Aline Farias', role:'Gerente de Tesouraria', area:'TESOURARIA', loc:'', desc:'', acts:[], photo:'fotos/aline-farias.jpg'},
   'ademilson-veloso': {parentId:'aline-farias', name:'Ademilson Veloso', role:'Analista de Tesouraria', area:'TESOURARIA', loc:'', desc:'', acts:[]},
   'ana-puglia': {parentId:'aline-farias', name:'Ana Puglia', role:'Aprendiz', area:'TESOURARIA', loc:'', desc:'', acts:[]},
   'carina-moreira': {parentId:'aline-farias', name:'Carina Moreira', role:'Analista de Tesouraria', area:'TESOURARIA', loc:'', desc:'', acts:[]},
@@ -337,7 +339,7 @@ const people = {
   'jaqueline-monique': {parentId:'aline-farias', name:'Jaqueline Monique', role:'Especialista em Tesouraria', area:'TESOURARIA', loc:'', desc:'', acts:[]},
   'paula-sanchez': {parentId:'aline-farias', name:'Paula Sanchez', role:'Analista de Tesouraria', area:'TESOURARIA', loc:'', desc:'', acts:[]},
 
-  'paola-schreiber': {parentId:'paulo-chiaradia', name:'Paola Schreiber', role:'Gerente Administrativo', area:'COMPRAS & FACILITIES', loc:'', desc:'', acts:[]},
+  'paola-schreiber': {parentId:'paulo-chiaradia', name:'Paola Schreiber', role:'Gerente Administrativo', area:'COMPRAS & FACILITIES', loc:'', desc:'', acts:[], photo:'fotos/paola-schreiber.jpg'},
   'ana-paula': {parentId:'paola-schreiber', name:'Ana Paula', role:'Analista de Compras', area:'COMPRAS & FACILITIES', loc:'', desc:'', acts:[]},
   'grasieli-ormundo': {parentId:'paola-schreiber', name:'Grasieli Ormundo', role:'Auxiliar de Limpeza', area:'COMPRAS & FACILITIES', loc:'', desc:'', acts:[]},
   'gielse-cristina': {parentId:'paola-schreiber', name:'Gielse Cristina', role:'Aprendiz', area:'COMPRAS & FACILITIES', loc:'', desc:'', acts:[]},
@@ -348,7 +350,7 @@ const people = {
   'maria-jose': {parentId:'paola-schreiber', name:'Maria José', role:'Aux. de Serviços Gerais', area:'COMPRAS & FACILITIES', loc:'', desc:'', acts:[]},
   'onelia-mianes': {parentId:'paola-schreiber', name:'Ónelia Mianes', role:'Auxiliar de Limpeza', area:'COMPRAS & FACILITIES', loc:'', desc:'', acts:[]},
 
-  'marcelo-barros': {parentId:'paulo-chiaradia', name:'Marcelo Barros', role:'Controller', area:'CONTROLADORIA', loc:'', desc:'', acts:[]},
+  'marcelo-barros': {parentId:'paulo-chiaradia', name:'Marcelo Barros', role:'Controller', area:'CONTROLADORIA', loc:'', desc:'', acts:[], photo:'fotos/marcelo-barros.jpg'},
   'andre-duarte': {parentId:'marcelo-barros', name:'André Duarte', role:'Analista de Faturamento', area:'CONTROLADORIA', loc:'', desc:'', acts:[]},
   'cleidemara-bartz': {parentId:'marcelo-barros', name:'Cleidemara Bartz', role:'Analista Administrativo', area:'CONTROLADORIA', loc:'', desc:'', acts:[]},
   'damires-da-silva': {parentId:'marcelo-barros', name:'Damires da Silva', role:'Analista de Faturamento', area:'CONTROLADORIA', loc:'', desc:'', acts:[]},
@@ -376,6 +378,10 @@ function initials(name){
   return name.split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
 }
 
+function avatarContent(p){
+  return p.photo ? `<img src="${p.photo}" alt="" loading="lazy">` : initials(p.name);
+}
+
 /* ===== Renderização da árvore (recursiva, começa toda fechada) ===== */
 function renderNode(id){
   const p = people[id];
@@ -389,7 +395,7 @@ function renderNode(id){
   card.className = 'org-card' + (kids.length ? ' manager' : '');
   card.innerHTML = `
     <div class="card-body">
-      <div class="avatar">${initials(p.name)}</div>
+      <div class="avatar">${avatarContent(p)}</div>
       <div class="card-info">
         <div class="card-name">${p.name}</div>
         <div class="card-role">${p.role}</div>
@@ -426,7 +432,7 @@ function refreshCardDisplay(id){
   if(!card) return;
   card.querySelector('.card-name').textContent = p.name;
   card.querySelector('.card-role').textContent = p.role;
-  card.querySelector('.avatar').textContent = initials(p.name);
+  if(!p.photo) card.querySelector('.avatar').textContent = initials(p.name);
 }
 function refreshAllCards(){ Object.keys(people).forEach(refreshCardDisplay); }
 
@@ -541,7 +547,7 @@ function openModalById(id){
   document.getElementById('modal-badge').style.background = color;
   document.getElementById('modal-badge').textContent = p.area || '';
   document.getElementById('modal-avatar').style.background = color;
-  document.getElementById('modal-avatar').textContent = initials(p.name);
+  document.getElementById('modal-avatar').innerHTML = avatarContent(p);
   renderModalFields(p);
   renderActs(p.acts);
 
@@ -631,7 +637,7 @@ async function saveEdits(){
 
   exitEditMode();
   refreshCardDisplay(id);
-  document.getElementById('modal-avatar').textContent = initials(people[id].name);
+  if(!people[id].photo) document.getElementById('modal-avatar').textContent = initials(people[id].name);
   showToast('Salvando…');
   const synced = await pushRemoteOverride(id, o);
   showToast(synced ? 'Salvo e sincronizado para todos' : 'Salvo neste navegador (sem conexão com o servidor)');

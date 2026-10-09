@@ -95,6 +95,10 @@ body{
 .org-card:hover{box-shadow:0 10px 26px rgba(66,44,117,.16);border-color:rgba(66,44,117,.32);transform:translateY(-2px)}
 .org-card.active{border-color:var(--pink);box-shadow:0 10px 26px rgba(255,47,105,.2)}
 .org-card.manager{background:linear-gradient(135deg,var(--purple) 0%,#4E3392 100%);border-color:transparent}
+.org-card.vago{background:rgba(255,47,105,.05);border:1.5px dashed var(--pink)}
+.org-card.vago:hover{border-color:var(--pink);box-shadow:0 10px 26px rgba(255,47,105,.18)}
+.org-card.vago .card-name{color:var(--pink);letter-spacing:.4px}
+.org-card.vago .avatar{background:transparent;border:1.5px dashed var(--pink);color:var(--pink)}
 
 .org-card .card-body{display:flex;align-items:flex-start;gap:9px}
 .org-card .avatar{
@@ -326,10 +330,15 @@ const people = {
   'paulo-chiaradia': {parentId:null, name:'Paulo Chiaradia', role:'Diretor Financeiro', area:'DIRETORIA', loc:'', desc:'', acts:[], photo:'fotos/paulo-chiaradia.jpg'},
 
   'gueilee-pereira': {parentId:'paulo-chiaradia', name:'Gueilee Pereira', role:'Gerente de Projetos', area:'PROJETOS', loc:'', desc:'', acts:[], photo:'fotos/gueilee-pereira.jpg'},
-  'caroline-oliveira': {parentId:'gueilee-pereira', name:'Caroline Oliveira', role:'Analista de Qualidade', area:'PROJETOS', loc:'', desc:'', acts:[], photo:'fotos/caroline-oliveira.jpg'},
-  'lucas-souza': {parentId:'gueilee-pereira', name:'Lucas Souza', role:'Assistente Administrativo', area:'PROJETOS', loc:'', desc:'', acts:[], photo:'fotos/lucas-souza.jpg'},
-  'marina-cardoso': {parentId:'gueilee-pereira', name:'Marina Cardoso', role:'Farmacêutica', area:'PROJETOS', loc:'', desc:'', acts:[], photo:'fotos/marina-cardoso.jpg'},
-  'millena-florentina': {parentId:'gueilee-pereira', name:'Millena Florentina', role:'Analista de Projetos', area:'PROJETOS', loc:'', desc:'', acts:[], photo:'fotos/millena-florentina.jpg'},
+  'millena-florentina': {parentId:'gueilee-pereira', name:'Millena Florentina', role:'PMO', area:'PROJETOS', loc:'', desc:'', acts:[], photo:'fotos/millena-florentina.jpg'},
+  'vago-assistente-projetos': {parentId:'millena-florentina', name:'VAGO', role:'Assistente de Projetos', area:'PROJETOS', loc:'', desc:'', acts:[], vago:true},
+  'lucas-souza': {parentId:'gueilee-pereira', name:'Lucas Souza', role:'Assistente de TI', area:'PROJETOS', loc:'', desc:'', acts:[], photo:'fotos/lucas-souza.jpg'},
+  'vago-desenvolvedor': {parentId:'gueilee-pereira', name:'VAGO', role:'Desenvolvedor', area:'PROJETOS', loc:'', desc:'', acts:[], vago:true},
+  'caroline-oliveira': {parentId:'gueilee-pereira', name:'Caroline Oliveira', role:'Coordenadora de Qualidade', area:'PROJETOS', loc:'', desc:'', acts:[], photo:'fotos/caroline-oliveira.jpg'},
+  'marina-cardoso': {parentId:'caroline-oliveira', name:'Marina Cardoso', role:'Farmacêutica', area:'PROJETOS', loc:'', desc:'', acts:[], photo:'fotos/marina-cardoso.jpg'},
+  'luciana-lanzillo': {parentId:'caroline-oliveira', name:'Luciana Lanzillo', role:'RT (Farma e Cosmético)', area:'PROJETOS', loc:'', desc:'', acts:[]},
+  'catia-giarnassi': {parentId:'caroline-oliveira', name:'Cátia Giarnassi', role:'RT (Química)', area:'PROJETOS', loc:'', desc:'', acts:[]},
+  'vago-assistente-qualidade': {parentId:'caroline-oliveira', name:'VAGO', role:'Assistente de Qualidade', area:'PROJETOS', loc:'', desc:'', acts:[], vago:true},
 
   'aline-farias': {parentId:'paulo-chiaradia', name:'Aline Farias', role:'Gerente de Tesouraria', area:'TESOURARIA', loc:'', desc:'', acts:[], photo:'fotos/aline-farias.jpg'},
   'ademilson-veloso': {parentId:'aline-farias', name:'Ademilson Veloso', role:'Analista de Tesouraria', area:'TESOURARIA', loc:'', desc:'', acts:[]},
@@ -379,7 +388,9 @@ function initials(name){
 }
 
 function avatarContent(p){
-  return p.photo ? `<img src="${p.photo}" alt="" loading="lazy">` : initials(p.name);
+  if(p.photo) return `<img src="${p.photo}" alt="" loading="lazy">`;
+  if(p.vago) return '+';
+  return initials(p.name);
 }
 
 /* ===== Renderização da árvore (recursiva, começa toda fechada) ===== */
@@ -392,7 +403,7 @@ function renderNode(id){
   node.dataset.id = id;
 
   const card = document.createElement('div');
-  card.className = 'org-card' + (kids.length ? ' manager' : '');
+  card.className = 'org-card' + (kids.length ? ' manager' : '') + (p.vago ? ' vago' : '');
   card.innerHTML = `
     <div class="card-body">
       <div class="avatar">${avatarContent(p)}</div>
@@ -432,7 +443,7 @@ function refreshCardDisplay(id){
   if(!card) return;
   card.querySelector('.card-name').textContent = p.name;
   card.querySelector('.card-role').textContent = p.role;
-  if(!p.photo) card.querySelector('.avatar').textContent = initials(p.name);
+  if(!p.photo) card.querySelector('.avatar').innerHTML = avatarContent(p);
 }
 function refreshAllCards(){ Object.keys(people).forEach(refreshCardDisplay); }
 
@@ -637,7 +648,7 @@ async function saveEdits(){
 
   exitEditMode();
   refreshCardDisplay(id);
-  if(!people[id].photo) document.getElementById('modal-avatar').textContent = initials(people[id].name);
+  if(!people[id].photo) document.getElementById('modal-avatar').innerHTML = avatarContent(people[id]);
   showToast('Salvando…');
   const synced = await pushRemoteOverride(id, o);
   showToast(synced ? 'Salvo e sincronizado para todos' : 'Salvo neste navegador (sem conexão com o servidor)');

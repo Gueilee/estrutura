@@ -687,6 +687,13 @@ function toggleFullscreen(){
     document.exitFullscreen();
   }
 }
+// Dentro do comparativo (iframe), a tela cheia é controlada pela página externa,
+// que também precisa manter visível a barra Antes/Depois — então escondemos
+// este botão interno para não fullscreenar só o conteúdo do iframe.
+if(window.self !== window.top){
+  const fsBtnEl = document.getElementById('fsBtn');
+  if(fsBtnEl) fsBtnEl.style.display = 'none';
+}
 document.addEventListener('fullscreenchange', ()=>{
   const label = document.getElementById('fsLabel');
   const icon = document.getElementById('fsIcon');

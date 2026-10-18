@@ -25,6 +25,17 @@ html,body{height:100%;font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Ro
 .toggle-btn:hover{opacity:1}
 .toggle-btn.active{background:#FF2F69;opacity:1;box-shadow:0 3px 10px rgba(255,47,105,.4)}
 
+.compare-fs-btn{
+  position:absolute;right:16px;top:50%;transform:translateY(-50%);
+  display:flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);
+  color:#FFFCF8;font-size:11.5px;font-weight:600;
+  padding:9px 14px;border-radius:10px;cursor:pointer;
+  transition:background .15s;white-space:nowrap;
+}
+.compare-fs-btn:hover{background:rgba(255,255,255,.2)}
+.compare-fs-btn svg{width:14px;height:14px;flex-shrink:0}
+
 .frames-wrap{position:relative;width:100%;height:calc(100vh - 56px)}
 .compare-frame{
   position:absolute;top:0;left:0;width:100%;height:100%;border:0;display:block;
@@ -32,6 +43,10 @@ html,body{height:100%;font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Ro
 }
 .compare-frame.hidden{opacity:0;pointer-events:none;visibility:hidden}
 
+@media (max-width:700px){
+  .compare-fs-btn span{display:none}
+  .compare-fs-btn{padding:9px}
+}
 @media (max-width:480px){
   .toggle-label{display:none}
   .toggle-btn{padding:8px 16px;font-size:12px}
@@ -46,6 +61,10 @@ html,body{height:100%;font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Ro
     <button class="toggle-btn active" id="btn-antes" type="button">Antes</button>
     <button class="toggle-btn" id="btn-depois" type="button">Depois</button>
   </div>
+  <button class="compare-fs-btn" id="compareFsBtn" type="button">
+    <svg id="compareFsIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+    <span id="compareFsLabel">Tela cheia</span>
+  </button>
 </div>
 
 <div class="frames-wrap">
@@ -73,6 +92,27 @@ function showDepois(){
 }
 btnAntes.addEventListener('click', showAntes);
 btnDepois.addEventListener('click', showDepois);
+
+/* ===== Tela cheia (fullscreena a página inteira, barra incluída) ===== */
+const compareFsBtn = document.getElementById('compareFsBtn');
+compareFsBtn.addEventListener('click', ()=>{
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen().catch(()=>{});
+  } else {
+    document.exitFullscreen();
+  }
+});
+document.addEventListener('fullscreenchange', ()=>{
+  const label = document.getElementById('compareFsLabel');
+  const icon = document.getElementById('compareFsIcon');
+  if(document.fullscreenElement){
+    label.textContent = 'Sair da tela cheia';
+    icon.innerHTML = '<path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/>';
+  } else {
+    label.textContent = 'Tela cheia';
+    icon.innerHTML = '<path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/>';
+  }
+});
 </script>
 </body>
 </html>

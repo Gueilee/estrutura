@@ -227,13 +227,7 @@ footer{text-align:center;font-size:8.5px;color:var(--purple);opacity:.35;padding
       <line x1="1030" y1="126" x2="1030" y2="130" stroke="#422C75" stroke-width="1.3" opacity="0.45"/>
       <line x1="1230" y1="126" x2="1230" y2="130" stroke="#422C75" stroke-width="1.3" opacity="0.45"/>
       <line x1="1230" y1="200" x2="1230" y2="290" stroke="#422C75" stroke-width="1.1" opacity="0.4"/>
-      <!-- Espinha do PMO — conecta a Millena a todas as áreas, dos dois lados -->
-      <line x1="170" y1="214" x2="1230" y2="214" stroke="#FF2F69" stroke-width="1.2" stroke-dasharray="5,3" opacity="0.5"/>
-      <circle cx="170" cy="214" r="2.6" fill="#FF2F69" opacity="0.75"/>
-      <circle cx="490" cy="214" r="2.6" fill="#FF2F69" opacity="0.75"/>
-      <circle cx="1030" cy="214" r="2.6" fill="#FF2F69" opacity="0.75"/>
-      <circle cx="1230" cy="214" r="2.6" fill="#FF2F69" opacity="0.75"/>
-      <line x1="1030" y1="200" x2="1030" y2="276" stroke="#FF2F69" stroke-width="1.2" stroke-dasharray="5,3" opacity="0.65"/>
+      <line x1="1030" y1="200" x2="1030" y2="290" stroke="#422C75" stroke-width="1.1" opacity="0.4"/>
       <text x="330" y="11" text-anchor="middle" fill="#422C75" font-size="7.5" font-weight="700" letter-spacing="0.8" opacity="0.38">INTRALOGÍSTICA</text>
       <rect x="180" y="18" width="300" height="70" rx="12" fill="#422C75"/>
       <text x="330" y="48" text-anchor="middle" fill="#FFFCF8" font-size="14" font-weight="700">DERIK SEVERINO</text>
@@ -291,10 +285,7 @@ footer{text-align:center;font-size:8.5px;color:var(--purple);opacity:.35;padding
       <rect x="948" y="130" width="165" height="70" rx="10" fill="#422C75"/>
       <text x="1030" y="159" text-anchor="middle" fill="#FFFCF8" font-size="8.5" font-weight="700" letter-spacing="0.2">PROJETOS &amp;</text>
       <text x="1030" y="171" text-anchor="middle" fill="#FFFCF8" font-size="8.5" font-weight="700" letter-spacing="0.2">MELHORIA CONTÍNUA</text>
-      <rect x="941" y="283" width="179" height="92" rx="12" fill="#FF2F69" opacity="0.08"/>
-      <rect x="992" y="276" width="76" height="17" rx="8" fill="#FF2F69"/>
-      <text x="1030" y="288" text-anchor="middle" fill="#FFFCF8" font-size="7.5" font-weight="700" letter-spacing="0.6">PMO</text>
-      <rect x="948" y="290" width="165" height="78" rx="10" fill="#FFFCF8" stroke="#FF2F69" stroke-width="2"/>
+      <rect x="948" y="290" width="165" height="78" rx="10" fill="#FFFCF8" stroke="#422C75" stroke-width="1.3" stroke-opacity="0.55"/>
       <text x="1030" y="323" text-anchor="middle" fill="#422C75" font-size="12" font-weight="700">Millena Ferreira</text>
       <text x="1030" y="341" text-anchor="middle" fill="#FF2F69" font-size="10">Analista de Projetos</text>
       <rect x="1148" y="130" width="165" height="70" rx="10" fill="#422C75"/>
@@ -342,7 +333,7 @@ footer{text-align:center;font-size:8.5px;color:var(--purple);opacity:.35;padding
           <title>Carol Pereira</title>
         </rect>
         <!-- Millena index=10 -->
-        <rect x="948" y="283" width="165" height="85" rx="8" fill="transparent" onclick="openModalByIndex(10)">
+        <rect x="948" y="290" width="165" height="78" rx="8" fill="transparent" onclick="openModalByIndex(10)">
           <title>Millena Ferreira</title>
         </rect>
         <!-- Em contratação index=11 -->
@@ -458,10 +449,9 @@ const people = [
     acts:["Responsabilidade técnica farmacêutica","Conformidade com exigências da Anvisa","Gestão de documentação regulatória","Controle de produtos com restrição regulatória","Interface com responsáveis técnicas regionais","Acompanhamento de laudos e certificações","Orientação técnica sobre armazenagem de fármacos"]
   },
   {
-    name:"Millena Ferreira", role:"Analista de Projetos · PMO", loc:"Todas as áreas",
-    area:"PMO", color:"#FF2F69", group:"comercio", pmo:true,
-    desc:"Definir, manter e disseminar a metodologia de gerenciamento de projetos, apoiar gestores e equipes na aplicação dos processos e artefatos da metodologia, monitorar indicadores, riscos, cronogramas e a saúde do portfólio de projetos. Conduzir os ritos de governança e reportar o status dos projetos a liderança.",
-    acts:["PMO — gestão de portfólio de projetos","Governança e padronização de processos de projetos","Monitoramento de cronogramas e entregas","Acompanhamento de indicadores e KPIs","Facilitação de rituais de gestão (reuniões, reviews)","Elaboração de relatórios e dashboards gerenciais","Gestão de riscos e impedimentos","Interface entre áreas: TI, Projetos e Operações","Melhoria contínua de metodologias de projetos"]
+    name:"Millena Ferreira", role:"Analista de Projetos", loc:"Vendemmia Comércio",
+    area:"PROJETOS", color:"#FF2F69", group:"comercio", desc:"",
+    acts:["Gestão de projetos","Implantação de melhorias operacionais","Acompanhamento de cronogramas","Interface com operações e clientes","Melhoria contínua de processos"]
   },
   {
     name:"Em contratação", role:"Analista de Projetos JR", loc:"Itapevi",
@@ -704,6 +694,13 @@ function toggleFullscreen(){
   } else {
     document.exitFullscreen();
   }
+}
+// Dentro do comparativo (iframe), a tela cheia é controlada pela página externa,
+// que também precisa manter visível a barra Antes/Depois — então escondemos
+// este botão interno para não fullscreenar só o conteúdo do iframe.
+if(window.self !== window.top){
+  const fsBtn = document.getElementById('fsBtn');
+  if(fsBtn) fsBtn.style.display = 'none';
 }
 document.addEventListener('fullscreenchange', ()=>{
   const label = document.getElementById('fsLabel');
